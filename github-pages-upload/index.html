@@ -1,0 +1,2646 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Little Wisdom</title>
+  <meta name="description" content="Meaningful ideas for a life of curiosity, clarity, and purpose. A small illustrated magazine of 82 quotes, in English and Arabic.">
+  <meta name="theme-color" content="#f5eedf">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%233a2e26'/%3E%3Cpath d='M9 22V10h4l3 8 3-8h4v12' fill='none' stroke='%23f5eedf' stroke-width='2.2' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <!-- Fonts load from Google Fonts; the CSS falls back to system fonts if offline. Arabic faces are only downloaded when Arabic text is on screen. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Inter:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;1,400&family=Noto+Naskh+Arabic:wght@400;500;600&display=swap">
+  <style>/*
+ * Little Wisdom — a quiet Japanese home.
+ * Principles: ma (room to breathe), wabi-sabi (imperfect, natural), shibui (understated).
+ * Typography is the main design element; paper, wood and light stay in the background.
+ *
+ * 1 Tokens · 2 Base · 3 Type · 4 Header/footer · 5 Controls · 6 Art
+ * 7 Home · 8 Cards · 9 Library · 10 Quote page · 11 Notebook · 12 Empty/toast
+ * 13 Motion · 14 Responsive · 15 Arabic / RTL
+ * Layout uses logical properties (inline/block), so right-to-left needs very little extra.
+ */
+
+/* ============ 1. Design tokens ============ */
+:root {
+  /* paper & ink */
+  --paper: #f5eedf;
+  --paper-2: #ede4d0;
+  --card: #fbf7ec;
+  --ink: #2f2722;
+  --ink-soft: #5b4b3f;
+  --ink-mute: #76634f;
+  --ink-btn: #3d3129;
+  --line: rgba(91, 75, 63, 0.2);
+  --line-strong: rgba(91, 75, 63, 0.42);
+  /* materials */
+  --wood: #8c6a4a;
+  --wood-soft: rgba(140, 106, 74, 0.14);
+  --sage: #5f7659;
+  --sage-soft: #dfe5d2;
+  --blue: #4d6178;
+  --terracotta: #a85d48;
+  --accent: #9c5239;          /* shifts with the season (see data-season) */
+  --accent-soft: rgba(156, 82, 57, 0.12);
+  /* type */
+  --font-display: 'Cormorant Garamond', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --font-text: 'Lora', 'Iowan Old Style', Georgia, serif;
+  --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --fs-display: clamp(3.1rem, 8.4vw, 6rem);
+  --fs-h1: clamp(2.3rem, 5vw, 3.6rem);
+  --fs-h2: clamp(1.75rem, 3.2vw, 2.4rem);
+  --fs-h3: 1.4rem;
+  --fs-lede: clamp(1.1rem, 1.6vw, 1.25rem);
+  --fs-body: 1.0625rem;
+  --fs-small: 0.9rem;
+  --fs-meta: 0.8125rem;
+  /* space, shape, depth, motion */
+  --s-1: 0.5rem; --s-2: 0.75rem; --s-3: 1rem; --s-4: 1.5rem; --s-5: 2.5rem; --s-6: 4rem;
+  --r-s: 0.5rem; --r-m: 0.875rem; --r-l: 1.25rem;
+  --shadow-s: 0 1px 2px rgba(60, 40, 25, 0.06), 0 6px 18px -10px rgba(60, 40, 25, 0.22);
+  --shadow-m: 0 2px 4px rgba(60, 40, 25, 0.05), 0 18px 40px -22px rgba(60, 40, 25, 0.4);
+  --ease: cubic-bezier(0.3, 0.7, 0.2, 1);
+  --t: 0.22s;
+  --wrap: 72rem;
+  --read: 40rem;
+  --noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .36 0 0 0 0 .28 0 0 0 0 .2 .16 0 0 0 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  color-scheme: light;
+}
+/* Seasons: only the accent changes, so the site is always recognisable. */
+:root[data-season='spring'] { --accent: #9a5048; --accent-soft: rgba(154, 80, 72, 0.12); }
+:root[data-season='summer'] { --accent: #46705a; --accent-soft: rgba(70, 112, 90, 0.12); }
+:root[data-season='autumn'] { --accent: #9c5239; --accent-soft: rgba(156, 82, 57, 0.12); }
+:root[data-season='winter'] { --accent: #4d6178; --accent-soft: rgba(77, 97, 120, 0.12); }
+
+/* Language decides the type families. Variables inherit, so a stray English quote inside an Arabic page keeps its own fonts. */
+:lang(ar) {
+  --font-display: 'Noto Naskh Arabic', 'Amiri', 'Traditional Arabic', 'Geeza Pro', serif;
+  --font-text: 'Noto Naskh Arabic', 'Amiri', 'Traditional Arabic', 'Geeza Pro', serif;
+  --font-ui: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, system-ui, sans-serif;
+}
+:lang(ar), :lang(ar) * { letter-spacing: 0 !important; }
+
+/* ============ 2. Base ============ */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body {
+  margin: 0; min-height: 100vh; display: flex; flex-direction: column;
+  background: var(--paper) var(--noise); color: var(--ink);
+  font-family: var(--font-ui); font-size: var(--fs-body); line-height: 1.65;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+main { flex: 1; }
+main:focus, main:focus-visible, [tabindex='-1']:focus-visible { outline: none; }
+h1, h2, h3, p, ul, ol, figure, blockquote { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; text-decoration-color: var(--line-strong); text-underline-offset: 0.2em; }
+a:hover { text-decoration-color: var(--accent); }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+::selection { background: var(--accent-soft); }
+.wrap { width: min(100% - 2.5rem, var(--wrap)); margin-inline: auto; }
+.visually-hidden {
+  position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+.skip-link {
+  position: absolute; inset-inline-start: 1rem; top: -4rem; z-index: 50; padding: 0.7rem 1rem;
+  background: var(--ink-btn); color: var(--card); border-radius: var(--r-s); text-decoration: none;
+}
+.skip-link:focus { top: 1rem; }
+.loading { min-height: 50vh; display: grid; place-items: center; color: var(--ink-mute); font-family: var(--font-display); font-size: 1.5rem; font-style: italic; }
+
+/* ============ 3. Type ============ */
+h1, h2, h3 { font-family: var(--font-display); font-weight: 600; line-height: 1.12; color: var(--ink); text-wrap: balance; }
+h1 { font-size: var(--fs-h1); font-weight: 500; }
+h2 { font-size: var(--fs-h2); }
+h3 { font-size: var(--fs-h3); }
+.label { font-family: var(--font-ui); font-size: var(--fs-meta); color: var(--ink-mute); letter-spacing: 0.02em; }
+.q-text { white-space: pre-line; overflow-wrap: break-word; hyphens: manual; }
+:lang(ar) h1, :lang(ar) h2, :lang(ar) h3 { line-height: 1.4; font-weight: 600; }
+:lang(ar) h1 { font-weight: 500; }
+
+/* ============ 4. Header & footer ============ */
+.site-header {
+  position: sticky; top: 0; z-index: 20;
+  background: rgba(245, 238, 223, 0.88); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.nav { display: flex; align-items: center; gap: var(--s-4); min-height: 4.25rem; }
+.logo {
+  display: inline-flex; align-items: center; gap: 0.65rem; margin-inline-end: auto; text-decoration: none;
+  font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600; font-size: 1.65rem; letter-spacing: 0; white-space: nowrap; color: var(--ink);
+}
+.logo svg { width: 1.6rem; height: 1.6rem; color: var(--ink-btn); }
+.nav-links { display: flex; align-items: center; gap: 0.25rem; }
+.nav-link {
+  display: inline-flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; padding: 0 0.9rem; border-radius: 999px;
+  font-size: var(--fs-small); font-weight: 500; color: var(--ink-soft); text-decoration: none; transition: background var(--t), color var(--t);
+}
+.nav-link:hover { background: var(--wood-soft); color: var(--ink); }
+.nav-link[aria-current='page'] { color: var(--ink); background: var(--wood-soft); }
+.count-badge {
+  display: inline-grid; place-items: center; min-width: 1.4rem; height: 1.4rem; padding: 0 0.35rem; margin-inline-start: 0.4rem;
+  border-radius: 999px; background: var(--accent); color: #fff; font-size: 0.75rem; font-weight: 600; line-height: 1;
+}
+.lang-switch { display: inline-flex; padding: 0.2rem; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--card); }
+.lang-btn {
+  min-height: 2.5rem; min-width: 3.25rem; padding: 0 0.85rem; border: 0; border-radius: 999px; background: transparent;
+  font-size: var(--fs-small); font-weight: 500; color: var(--ink-soft); transition: background var(--t), color var(--t);
+}
+.lang-btn:hover { color: var(--ink); }
+.lang-btn[aria-pressed='true'] { background: var(--ink-btn); color: var(--card); }
+
+.site-footer { margin-top: var(--s-6); padding-block: var(--s-6) var(--s-5); background: var(--paper-2); border-top: 1px solid var(--line); }
+.footer-grid { display: flex; flex-wrap: wrap; gap: var(--s-5); justify-content: space-between; align-items: end; margin-bottom: var(--s-5); }
+.closing { max-width: 26rem; font-family: var(--font-display); font-style: italic; font-size: clamp(1.5rem, 2.6vw, 1.9rem); line-height: 1.3; color: var(--ink-soft); }
+:lang(ar) .closing { font-style: normal; line-height: 1.7; }
+.site-footer ul { display: flex; flex-wrap: wrap; gap: 0.25rem 1.5rem; }
+.site-footer li a { display: inline-flex; align-items: center; min-height: 2.75rem; font-size: var(--fs-small); color: var(--ink-soft); }
+.site-footer small { display: block; max-width: 40rem; color: var(--ink-mute); font-size: var(--fs-meta); line-height: 1.7; }
+
+/* ============ 5. Controls ============ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.55rem; min-height: 2.75rem; padding: 0.6rem 1.3rem;
+  border: 1px solid var(--ink-btn); border-radius: var(--r-s); background: var(--ink-btn); color: var(--card);
+  font-size: var(--fs-small); font-weight: 500; line-height: 1.2; text-decoration: none; text-align: center;
+  transition: background var(--t), border-color var(--t), transform var(--t) var(--ease);
+}
+.btn svg { width: 1.1rem; height: 1.1rem; flex: none; }
+.btn:hover { background: #55443a; border-color: #55443a; }
+.btn:active { transform: translateY(1px); }
+.btn--ghost { background: transparent; color: var(--ink); border-color: var(--line-strong); }
+.btn--ghost:hover { background: var(--wood-soft); border-color: var(--wood); }
+.btn--small { padding: 0.45rem 1rem; }
+.btn[data-saved='true'] { background: var(--sage-soft); border-color: var(--sage); color: #2e4a2c; }
+.btn[data-saved='true'] svg, .icon-btn[data-saved='true'] svg { fill: currentColor; }
+.icon-btn {
+  position: absolute; inset-block-start: 0.7rem; inset-inline-end: 0.7rem; display: grid; place-items: center; width: 2.75rem; height: 2.75rem;
+  border: 0; border-radius: 50%; background: transparent; color: var(--ink-mute); transition: background var(--t), color var(--t);
+}
+.icon-btn svg { width: 1.3rem; height: 1.3rem; }
+.icon-btn:hover { background: var(--wood-soft); color: var(--ink); }
+.icon-btn[data-saved='true'] { color: var(--accent); }
+.chip {
+  display: inline-block; padding: 0.2rem 0.75rem; border-radius: 999px; background: var(--wood-soft);
+  font-size: var(--fs-meta); line-height: 1.5; color: var(--ink-soft); text-decoration: none; transition: background var(--t);
+}
+a.chip:hover { background: rgba(140, 106, 74, 0.26); }
+.pill {
+  min-height: 2.5rem; padding: 0.35rem 1rem; border: 1px solid var(--line-strong); border-radius: 999px; background: transparent;
+  font-size: var(--fs-small); color: var(--ink-soft); transition: background var(--t), color var(--t), border-color var(--t);
+}
+.pill:hover { background: var(--wood-soft); }
+.pill[aria-pressed='true'] { background: var(--ink-btn); border-color: var(--ink-btn); color: var(--card); }
+
+/* ============ 6. Art ============ */
+.art { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--paper-2); }
+.art svg { width: 100%; height: 100%; }
+/* A little paper grain and a soft vignette over every illustration, so they feel printed, not screen-flat. */
+.art::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; background-image: var(--noise), radial-gradient(ellipse at center, transparent 60%, rgba(60, 40, 25, 0.16));
+  opacity: 0.9; mix-blend-mode: multiply;
+}
+
+/* ============ 7. Home ============ */
+.hero { padding-top: clamp(3.5rem, 9vw, 7rem); }
+.hero-text { text-align: center; max-width: 46rem; }
+.greeting { font-size: var(--fs-small); color: var(--ink-mute); }
+.hero h1 { margin-top: var(--s-3); font-size: var(--fs-display); line-height: 0.98; letter-spacing: -0.015em; font-weight: 500; }
+.hero h1 em { font-style: italic; color: var(--accent); }
+:lang(ar) .hero h1 { line-height: 1.3; }
+:lang(ar) .hero h1 em { font-style: normal; }
+.hero-lede { max-width: 32rem; margin: var(--s-4) auto 0; font-family: var(--font-text); font-size: var(--fs-lede); line-height: 1.7; color: var(--ink-soft); }
+.hero-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--s-2); margin-top: var(--s-5); }
+.resume { margin-top: var(--s-4); font-size: var(--fs-small); color: var(--ink-mute); }
+.resume a { display: inline-block; padding-block: 0.5rem; }
+.resume__title { font-family: var(--font-display); font-size: 1.1em; color: var(--ink-soft); }
+.hero-scene { margin-top: clamp(2.5rem, 6vw, 4.5rem); }
+.scene-frame { position: relative; aspect-ratio: 1200 / 520; border-radius: var(--r-l); overflow: hidden; box-shadow: var(--shadow-m); }
+/* Light follows the visitor's own clock: morning sun, evening amber, night blue. Day is left untouched. */
+.daylight { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: multiply; z-index: 2; }
+:root[data-time='morning'] .daylight { background: linear-gradient(100deg, rgba(255, 224, 150, 0.3), transparent 65%); }
+:root[data-time='evening'] .daylight { background: linear-gradient(180deg, rgba(238, 150, 92, 0.24), rgba(130, 76, 96, 0.2)); }
+:root[data-time='night'] .daylight { background: rgba(38, 52, 92, 0.3); }
+
+.section { padding-block: clamp(3.5rem, 8vw, 6.5rem) 0; }
+.section-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--s-2) var(--s-4); margin-bottom: var(--s-5); }
+.section-head p { color: var(--ink-mute); font-size: var(--fs-small); }
+.section--last { padding-bottom: 0; }
+
+/* Featured quote: nothing else on the line. */
+.featured-sec { padding-top: clamp(5rem, 12vw, 9rem); }
+.featured { max-width: 52rem; text-align: center; }
+.featured .label { display: inline-block; }
+.featured .label::before { content: ''; display: block; width: 2.5rem; height: 2px; margin: 0 auto var(--s-4); border-radius: 2px; background: var(--wood); opacity: 0.6; }
+.featured .q-text { margin-top: var(--s-4); color: var(--ink); }
+.featured.len-short .q-text { font-family: var(--font-display); font-weight: 500; font-size: clamp(2.6rem, 6vw, 4.6rem); line-height: 1.08; text-wrap: balance; }
+.featured.len-medium .q-text { font-family: var(--font-display); font-weight: 500; font-size: clamp(1.95rem, 4vw, 3rem); line-height: 1.2; text-wrap: balance; }
+.featured.len-long .q-text { font-family: var(--font-text); font-size: clamp(1.15rem, 2vw, 1.4rem); line-height: 1.8; text-align: start; text-wrap: pretty; }
+.featured-title { margin-top: var(--s-4); font-family: var(--font-display); font-style: italic; font-size: 1.3rem; color: var(--ink-mute); }
+:lang(ar) .featured-title { font-style: normal; }
+.featured-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--s-2); margin-top: var(--s-5); }
+
+/* Themes as a bookshelf: books stand on a wooden plank. */
+.shelf { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3.25rem 0; padding-inline: 0.6rem; }
+.book {
+  position: relative; display: flex; flex-direction: column; justify-content: flex-end; gap: 0.5rem; align-self: end; margin-inline: 0.6rem;
+  padding: 1.25rem 1.1rem 1.3rem 1.7rem; border: 0; border-radius: 5px 5px 0 0; color: #f7f0e1; text-decoration: none; text-align: start;
+  transition: transform 0.3s var(--ease); box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.12) inset;
+}
+[dir='rtl'] .book { padding: 1.25rem 1.7rem 1.3rem 1.1rem; }
+.book::before { content: ''; position: absolute; inset-block: 0; inset-inline-start: 0; width: 0.8rem; background: rgba(0, 0, 0, 0.17); border-radius: 5px 0 0 0; }
+[dir='rtl'] .book::before { border-radius: 0 5px 0 0; }
+.book::after { content: ''; position: absolute; inset-inline: -0.6rem; bottom: -0.85rem; height: 0.85rem; background: linear-gradient(#a98764, #86644a); border-radius: 0 0 3px 3px; box-shadow: 0 6px 10px -6px rgba(60, 40, 25, 0.5); }
+.book:hover { transform: translateY(-6px); }
+.book .num { font-family: var(--font-text); font-style: italic; font-size: var(--fs-meta); opacity: 1; color: #efe6d3; }
+.book h3 { color: #fbf6ea; font-size: 1.5rem; line-height: 1.12; }
+.book p { font-size: 0.84rem; line-height: 1.5; color: #efe6d3; }
+.book--1 { background: #566e52; min-height: 15rem; } .book--2 { background: #4a5f78; min-height: 13rem; }
+.book--3 { background: #8f503d; min-height: 14.5rem; } .book--4 { background: #75573a; min-height: 12.5rem; }
+.book--5 { background: #3d342d; min-height: 14rem; } .book--6 { background: #476765; min-height: 13rem; }
+.book--7 { background: #86524f; min-height: 15rem; }
+.book--random { min-height: 9rem; justify-content: center; align-items: center; text-align: center; background: transparent; color: var(--ink-soft); border: 1.5px dashed var(--line-strong); border-radius: 5px 5px 0 0; box-shadow: none; font-size: var(--fs-small); }
+.book--random::before { display: none; }
+.book--random svg { width: 1.6rem; height: 1.6rem; }
+.book--random:hover { background: var(--wood-soft); }
+
+.discover { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-5) var(--s-6); }
+.discover h3 { margin-bottom: var(--s-2); padding-bottom: var(--s-2); border-bottom: 1px solid var(--line); font-size: 1.25rem; color: var(--ink-soft); }
+.discover li a { display: block; padding: 0.8rem 0; border-bottom: 1px solid var(--line); text-decoration: none; transition: padding var(--t) var(--ease); }
+.discover li a:hover { padding-inline-start: 0.4rem; }
+.d-title { display: block; font-family: var(--font-display); font-weight: 600; font-size: 1.3rem; line-height: 1.2; }
+.d-excerpt { display: -webkit-box; margin-top: 0.2rem; font-family: var(--font-text); font-size: 0.88rem; line-height: 1.6; color: var(--ink-soft); -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* ============ 8. Quote cards (one style, everywhere) ============ */
+.card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-4); align-items: stretch; }
+.qcard { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-m); box-shadow: var(--shadow-s); transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease), border-color var(--t); }
+.qcard:hover { transform: translateY(-3px); box-shadow: var(--shadow-m); border-color: var(--line-strong); }
+.qcard__link { display: flex; flex-direction: column; gap: 0.65rem; height: 100%; padding: 1.5rem 1.5rem 1.4rem; color: inherit; text-decoration: none; border-radius: inherit; }
+.qcard__no { padding-inline-end: 3rem; font-family: var(--font-text); font-style: italic; font-size: var(--fs-meta); color: var(--ink-mute); }
+:lang(ar) .qcard__no { font-style: normal; font-family: var(--font-ui); }
+.qcard__title { font-family: var(--font-display); font-weight: 600; font-size: 1.55rem; line-height: 1.15; }
+.qcard .q-text { font-family: var(--font-text); font-size: 1.02rem; line-height: 1.75; color: var(--ink-soft); }
+.qcard.len-short .q-text { font-family: var(--font-display); font-weight: 500; font-size: 1.85rem; line-height: 1.22; color: var(--ink); text-wrap: balance; }
+.qcard__meta { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: auto; padding-top: 0.5rem; }
+.qcard__cta { display: inline-flex; align-items: center; gap: 0.4rem; font-size: var(--fs-small); font-weight: 500; color: var(--accent); }
+.qcard__cta svg { width: 1rem; height: 1rem; transition: transform var(--t) var(--ease); }
+.qcard:hover .qcard__cta svg { transform: translateX(3px); }
+[dir='rtl'] .qcard:hover .qcard__cta svg { transform: scaleX(-1) translateX(3px); }
+
+/* Quote 52 is typed in capitals: set it smaller and calmer so it does not shout. */
+.is-caps .q-text, .qcard.is-caps .q-text, .qcard.len-short.is-caps .q-text { font-family: var(--font-text); font-weight: 500; font-size: 0.98rem; line-height: 1.85; letter-spacing: 0.045em; color: var(--ink-soft); }
+
+/* ============ 9. Library: an organised reading room ============ */
+.page-head { max-width: 40rem; margin: clamp(3rem, 7vw, 5rem) auto var(--s-5); text-align: center; }
+.page-head p { margin-top: var(--s-3); font-family: var(--font-text); color: var(--ink-soft); line-height: 1.75; }
+.filters { display: grid; gap: var(--s-3); max-width: 52rem; margin: 0 auto var(--s-5); }
+.search-field { position: relative; display: flex; align-items: center; border-bottom: 1.5px solid var(--line-strong); transition: border-color var(--t); }
+.search-field:focus-within { border-color: var(--accent); box-shadow: 0 2px 0 var(--accent); }
+.search-field svg { flex: none; width: 1.4rem; height: 1.4rem; color: var(--ink-mute); }
+.search-field input { flex: 1; min-height: 3.5rem; padding: 0 var(--s-2); border: 0; background: transparent; font-family: var(--font-display); font-size: 1.6rem; color: var(--ink); }
+.search-field input::placeholder { color: var(--ink-mute); opacity: 1; }
+.search-field input:focus { outline: none; }
+:lang(ar) .search-field input { font-size: 1.3rem; }
+.filter-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2) var(--s-3); }
+.filter-row--themes { gap: 0.5rem; }
+.select-wrap { display: inline-flex; align-items: center; gap: 0.5rem; font-size: var(--fs-small); color: var(--ink-mute); }
+select { min-height: 2.5rem; padding: 0.3rem 0.7rem; border: 1px solid var(--line-strong); border-radius: var(--r-s); background: var(--card); color: var(--ink); font-size: var(--fs-small); }
+.result-count { margin-inline-start: auto; font-size: var(--fs-small); color: var(--ink-mute); }
+#results { margin-top: var(--s-5); }
+
+/* ============ 10. Quote page: sitting with one thought ============ */
+.reader { padding-top: var(--s-4); }
+.quote-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-2); }
+.back-link { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; font-size: var(--fs-small); color: var(--ink-soft); text-decoration: none; }
+.back-link:hover { color: var(--ink); text-decoration: underline; }
+.back-link svg { width: 1.1rem; height: 1.1rem; }
+.quote-bar__steps { display: flex; gap: 0.5rem; }
+.step-btn { min-height: 2.75rem; padding-inline: 1.1rem; }
+.step-btn svg { width: 1.1rem; height: 1.1rem; }
+.step-btn--next { background: var(--ink-btn); color: var(--card); border: 1px solid var(--ink-btn); }
+.step-btn--prev { background: transparent; color: var(--ink); border: 1px solid var(--line-strong); }
+.step-btn--next:hover { background: #55443a; }
+.step-btn--prev:hover { background: var(--wood-soft); }
+.is-disabled { opacity: 0.4; pointer-events: none; }
+.position { font-size: var(--fs-meta); color: var(--ink-mute); }
+.position a { color: var(--ink-soft); }
+.position--top { margin-top: 0.25rem; }
+.reader-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(2rem, 5vw, 4.5rem); align-items: start; margin-top: var(--s-4); }
+/* Picture and quote sit side by side; the picture stays in view while a long quote is read. */
+.reader-art { position: sticky; top: 5.75rem; aspect-ratio: 4 / 3.4; border-radius: var(--r-l); overflow: hidden; box-shadow: var(--shadow-m); }
+.reader-grid { min-width: 0; padding-block: var(--s-3); }
+.reader-grid article { text-align: start; }
+.reader-grid article > .label::before { content: ''; display: block; width: 2.5rem; height: 2px; margin: 0 0 var(--s-4); border-radius: 2px; background: var(--wood); opacity: 0.6; }
+.reader-title { margin-top: var(--s-2); font-size: clamp(1.7rem, 3.2vw, 2.3rem); font-weight: 600; color: var(--ink-soft); outline: none; }
+.reader-grid .q-text { margin-top: var(--s-4); color: var(--ink); }
+.reader-grid .len-short .q-text { font-family: var(--font-display); font-weight: 500; font-size: clamp(2.5rem, 4.6vw, 4rem); line-height: 1.08; text-wrap: balance; }
+.reader-grid .len-medium .q-text { font-family: var(--font-display); font-weight: 500; font-size: clamp(1.9rem, 3.4vw, 2.7rem); line-height: 1.2; text-wrap: balance; }
+.reader-grid .len-long .q-text { font-family: var(--font-text); font-size: clamp(1.12rem, 1.9vw, 1.3rem); line-height: 1.85; text-wrap: pretty; }
+.reader-grid .is-caps .q-text { font-size: clamp(1.05rem, 1.8vw, 1.2rem); line-height: 1.9; }
+.original { margin-top: var(--s-5); padding-inline-start: var(--s-3); border-inline-start: 2px solid var(--wood-soft); text-align: start; }
+.original__text { margin-top: 0.4rem; font-family: 'Lora', Georgia, serif; font-style: italic; font-size: 1.02rem; line-height: 1.75; color: var(--ink-soft); white-space: pre-line; text-align: left; }
+.reader-source { margin-top: var(--s-4); font-size: var(--fs-small); color: var(--ink-mute); }
+.reader-tags { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 0.4rem; margin-top: var(--s-5); }
+.reader-tags .chip { padding: 0.4rem 0.9rem; }
+.reader-actions { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: var(--s-2); margin-top: var(--s-4); }
+
+.continue { max-width: 52rem; margin: clamp(3.5rem, 8vw, 6rem) auto 0; padding-top: var(--s-5); border-top: 1px solid var(--line); text-align: center; }
+.continue h2 { font-size: 1.8rem; }
+.continue .position { margin-top: 0.4rem; }
+.continue__steps { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3); margin-top: var(--s-4); text-align: start; }
+.step { display: flex; flex-direction: column; gap: 0.35rem; padding: 1.1rem 1.3rem; border: 1px solid var(--line); border-radius: var(--r-m); background: var(--card); color: inherit; text-decoration: none; box-shadow: var(--shadow-s); transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease), border-color var(--t); }
+a.step:hover { transform: translateY(-2px); box-shadow: var(--shadow-m); border-color: var(--line-strong); }
+.step--next { background: var(--sage-soft); border-color: rgba(95, 118, 89, 0.45); }
+.step-dir { display: inline-flex; align-items: center; gap: 0.5rem; font-size: var(--fs-small); font-weight: 600; color: var(--ink-soft); }
+.step--next .step-dir { justify-content: flex-end; }
+[dir='rtl'] .step--next .step-dir { justify-content: flex-start; }
+.step-dir svg { width: 1.1rem; height: 1.1rem; }
+.step-title { font-family: var(--font-display); font-weight: 600; font-size: 1.35rem; line-height: 1.2; }
+.end-note { margin-top: var(--s-4); font-family: var(--font-text); font-style: italic; color: var(--ink-soft); }
+:lang(ar) .end-note { font-style: normal; }
+.hint { margin-top: var(--s-4); font-size: var(--fs-meta); color: var(--ink-mute); }
+@media (hover: none) { .hint { display: none; } }
+.related { margin-top: clamp(3.5rem, 8vw, 6rem); }
+.related h2 { margin-bottom: var(--s-4); text-align: center; font-size: 1.8rem; }
+
+/* ============ 11. Bookmarks: a personal notebook ============ */
+.notebook {
+  position: relative; max-width: 46rem; margin: var(--s-5) auto 0; padding: 0.75rem clamp(1rem, 4vw, 2.5rem) 1.5rem clamp(3.5rem, 8vw, 5rem);
+  background: #fbf6e8 var(--noise); border: 1px solid var(--line); border-radius: 0.4rem 1rem 1rem 0.4rem; box-shadow: var(--shadow-m);
+}
+[dir='rtl'] .notebook { padding: 0.75rem clamp(3.5rem, 8vw, 5rem) 1.5rem clamp(1rem, 4vw, 2.5rem); border-radius: 1rem 0.4rem 0.4rem 1rem; }
+/* margin rule + binding holes */
+.notebook::before { content: ''; position: absolute; inset-block: 0; inset-inline-start: clamp(2.6rem, 6vw, 3.6rem); width: 1px; background: rgba(168, 90, 63, 0.4); }
+.notebook::after { content: ''; position: absolute; inset-block: 1rem; inset-inline-start: 0.7rem; width: 0.7rem; background: radial-gradient(circle, rgba(60, 40, 25, 0.28) 0 38%, transparent 42%) 0 0 / 0.7rem 3.2rem repeat-y; }
+.notebook__list li { border-bottom: 1px dashed var(--line-strong); }
+.notebook__list li:last-child { border-bottom: 0; }
+.qcard--note { background: transparent; border: 0; border-radius: 0; box-shadow: none; }
+.qcard--note:hover { transform: none; box-shadow: none; background: rgba(255, 255, 255, 0.45); }
+.qcard--note .qcard__link { padding: 1.4rem 3rem 1.4rem 0; gap: 0.4rem; }
+[dir='rtl'] .qcard--note .qcard__link { padding: 1.4rem 0 1.4rem 3rem; }
+.qcard--note .qcard__title { font-size: 1.45rem; }
+.qcard--note .icon-btn { inset-inline-end: -0.5rem; inset-block-start: 1rem; }
+.qcard--note.len-short .q-text { font-size: 1.5rem; }
+
+/* ============ 12. Empty states & toast ============ */
+.empty { max-width: 30rem; margin: var(--s-5) auto 0; text-align: center; }
+.empty__art { aspect-ratio: 3 / 2; margin-bottom: var(--s-4); border-radius: var(--r-l); overflow: hidden; box-shadow: var(--shadow-s); }
+.empty p { margin: var(--s-2) 0 var(--s-4); font-family: var(--font-text); color: var(--ink-soft); }
+.toast {
+  position: fixed; inset-inline: 1rem; bottom: 1.5rem; z-index: 40; width: fit-content; max-width: min(28rem, calc(100vw - 2rem)); margin-inline: auto;
+  padding: 0.8rem 1.3rem; border-radius: 999px; background: var(--ink-btn); color: var(--card); font-size: var(--fs-small); text-align: center; box-shadow: var(--shadow-m);
+  opacity: 0; visibility: hidden; transform: translateY(0.75rem); pointer-events: none; transition: opacity 0.25s, transform 0.25s var(--ease), visibility 0s 0.25s;
+}
+.toast.is-visible { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+
+/* ============ 13. Motion (all of it switched off for reduced-motion) ============ */
+@keyframes view-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.28); } 100% { transform: scale(1); } }
+@keyframes drizzle { from { transform: translate(0, -3px); opacity: 0.35; } to { transform: translate(-4px, 6px); opacity: 0.7; } }
+@keyframes rise { from { transform: translateY(2px); opacity: 0.35; } to { transform: translateY(-5px); opacity: 0.85; } }
+@media (prefers-reduced-motion: no-preference) {
+  .view-in { animation: view-in 0.4s var(--ease) both; }
+  .is-popping svg { animation: pop 0.45s var(--ease); }
+  .art--live .rain { animation: drizzle 3.2s ease-in-out infinite alternate; }
+  .art--live .steam { animation: rise 4s ease-in-out infinite alternate; transform-box: fill-box; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+}
+
+/* ============ 14. Responsive ============ */
+@media (max-width: 960px) {
+  .card-grid { grid-template-columns: repeat(2, 1fr); }
+  .shelf { grid-template-columns: repeat(2, 1fr); }
+  .discover { grid-template-columns: 1fr; gap: var(--s-5); }
+}
+/* two columns of cards would leave an orphan when there are three related quotes: show two */
+@media (min-width: 701px) and (max-width: 960px) { .related .qcard:nth-child(3) { display: none; } }
+@media (max-width: 700px) {
+  :root { --fs-body: 1.03rem; }
+  .wrap { width: min(100% - 2rem, var(--wrap)); }
+  .card-grid { grid-template-columns: 1fr; }
+  .scene-frame { aspect-ratio: 4 / 3; }
+  .reader-split { grid-template-columns: 1fr; gap: var(--s-4); }
+  .reader-art { position: static; aspect-ratio: 3 / 2; border-radius: var(--r-m); }
+  .scene-frame { border-radius: var(--r-m); }
+  .label-long { display: none; }
+  .continue__steps { grid-template-columns: 1fr; }
+  .continue__steps .step--next { order: -1; }
+  .search-field input { font-size: 1.35rem; }
+  .filter-row--themes { flex-wrap: nowrap; overflow-x: auto; margin-inline: -1rem; padding-inline: 1rem; padding-bottom: 0.25rem; scrollbar-width: none; }
+  .filter-row--themes::-webkit-scrollbar { display: none; }
+  .filter-row--themes .pill { flex: none; white-space: nowrap; }
+  /* fade the far edge so it is clear the row scrolls sideways */
+  .filter-row--themes { -webkit-mask-image: linear-gradient(to right, #000 88%, transparent); mask-image: linear-gradient(to right, #000 88%, transparent); }
+  [dir='rtl'] .filter-row--themes { -webkit-mask-image: linear-gradient(to left, #000 88%, transparent); mask-image: linear-gradient(to left, #000 88%, transparent); }
+  .result-count { margin-inline-start: 0; flex-basis: 100%; }
+  .notebook { margin-inline: -0.5rem; }
+}
+@media (max-width: 520px) {
+  /* Two rows: wordmark + language on top, the two main links as a wide pair beneath. */
+  .nav { display: grid; grid-template-columns: 1fr auto; gap: 0.25rem 0.75rem; padding-block: 0.5rem; min-height: 0; }
+  .logo { font-size: 1.5rem; }
+  .nav-links { grid-column: 1 / -1; order: 3; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+  .nav-link { justify-content: center; border: 1px solid var(--line); }
+  .shelf { gap: 3rem 0; }
+  .book { padding: 1rem 0.8rem 1.1rem 1.4rem; }
+  [dir='rtl'] .book { padding: 1rem 1.4rem 1.1rem 0.8rem; }
+  .book h3 { font-size: 1.3rem; }
+  .quote-bar { gap: 0.25rem var(--s-2); }
+  .quote-bar__steps { width: 100%; }
+  .quote-bar__steps > * { flex: 1; }
+  .reader-actions .btn { flex: 1 1 100%; }
+}
+
+/* ============ 16. Discover what you need ============ */
+.choice-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; }
+.choice {
+  display: inline-flex; align-items: center; gap: 0.6rem; min-height: 2.9rem; padding: 0.5rem 1.15rem 0.5rem 0.9rem;
+  border: 1px solid var(--line-strong); border-radius: 999px; background: var(--card); color: var(--ink);
+  font-size: var(--fs-small); font-weight: 500; line-height: 1.2; text-decoration: none; box-shadow: var(--shadow-s);
+  transition: background var(--t), color var(--t), border-color var(--t), transform var(--t) var(--ease), box-shadow var(--t);
+}
+[dir='rtl'] .choice { padding: 0.5rem 0.9rem 0.5rem 1.15rem; }
+.choice svg { width: 1.45rem; height: 1.45rem; flex: none; color: var(--ink-soft); transition: color var(--t), transform 0.3s var(--ease); }
+.choice:hover { background: var(--paper-2); border-color: var(--wood); transform: translateY(-1px); }
+.choice:hover svg { transform: rotate(-6deg) scale(1.06); }
+.choice:active { transform: scale(0.97); }
+.choice[aria-pressed='true'] { background: var(--ink-btn); border-color: var(--ink-btn); color: var(--card); box-shadow: var(--shadow-m); }
+.choice[aria-pressed='true'] svg { color: var(--card); }
+.choice-grid--topics .choice { padding: 0.45rem 1.1rem; min-height: 2.75rem; }
+.choice--small { min-height: 2.75rem; padding-inline: 1rem; font-weight: 400; }
+
+.discover-page { padding-bottom: var(--s-4); }
+.ask { max-width: 58rem; margin: var(--s-6) auto 0; text-align: center; }
+.ask:first-of-type { margin-top: var(--s-5); }
+.ask h2 { margin-bottom: var(--s-4); font-size: clamp(1.6rem, 3vw, 2.1rem); }
+
+.rec { max-width: 72rem; margin: var(--s-6) auto 0; padding-top: var(--s-5); border-top: 1px solid var(--line); text-align: center; scroll-margin-top: 5.5rem; }
+.rec:empty { display: none; }
+.rec .card-grid { margin-top: var(--s-5); text-align: start; }
+.rec__title { margin-top: 0.4rem; font-size: var(--fs-h1); font-weight: 500; }
+.rec__count, .rec__few { margin-top: 0.5rem; font-size: var(--fs-small); color: var(--ink-mute); }
+.rec__few { font-family: var(--font-text); font-style: italic; color: var(--ink-soft); }
+:lang(ar) .rec__few { font-style: normal; }
+.rec__related { margin-top: var(--s-6); }
+.rec__related h3 { margin-bottom: var(--s-3); font-size: 1.3rem; color: var(--ink-soft); }
+.rec__actions { display: flex; justify-content: center; margin-top: var(--s-5); }
+.rec__actions .btn svg { transform: rotate(90deg); }
+.disc-note { max-width: 36rem; margin: var(--s-5) auto 0; font-size: var(--fs-meta); line-height: 1.7; color: var(--ink-mute); }
+
+.teaser-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4); }
+.teaser { padding: clamp(1.4rem, 3vw, 2rem); background: var(--card); border: 1px solid var(--line); border-radius: var(--r-l); box-shadow: var(--shadow-s); text-align: center; }
+.teaser h3 { margin-bottom: var(--s-3); font-size: 1.5rem; }
+.teaser .choice { box-shadow: none; background: var(--paper); }
+.teaser .choice:hover { background: var(--paper-2); }
+.teaser-more { margin-top: var(--s-4); text-align: center; }
+
+@keyframes rec-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes choice-pop { 0% { transform: scale(0.96); } 60% { transform: scale(1.04); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: no-preference) {
+  .rec-in > .label, .rec-in > .rec__title, .rec-in > .rec__count { animation: rec-rise 0.45s var(--ease) backwards; }
+  .rec-in .card-grid .qcard { animation: rec-rise 0.5s var(--ease) backwards; animation-delay: calc(var(--i, 0) * 55ms + 80ms); }
+  .rec-in > .rec__related, .rec-in > .rec__actions { animation: rec-rise 0.5s var(--ease) 0.35s backwards; }
+  .choice[aria-pressed='true'] { animation: choice-pop 0.35s var(--ease); }
+}
+@media (max-width: 860px) { .teaser-grid { grid-template-columns: 1fr; } }
+@media (max-width: 520px) {
+  .nav-links { grid-template-columns: repeat(3, 1fr); gap: 0.35rem; }
+  .nav-link { padding-inline: 0.4rem; gap: 0.3rem; }
+  .choice-grid { gap: 0.5rem; }
+}
+
+/* ============ 15. Arabic & right-to-left ============ */
+[dir='rtl'] svg[data-flip] { transform: scaleX(-1); }
+:lang(ar) body, body:lang(ar) { line-height: 1.8; }
+:lang(ar) .btn, :lang(ar) .pill, :lang(ar) .nav-link, :lang(ar) .lang-btn { line-height: 1.4; }
+:lang(ar) .lang-btn[lang='en'] { font-family: 'Inter', system-ui, sans-serif; }
+.logo > span[lang='en'] { font-family: 'Cormorant Garamond', Georgia, serif; }
+:lang(ar) .qcard__title { font-size: 1.5rem; line-height: 1.5; }
+:lang(ar) .qcard .q-text { font-size: 1.15rem; line-height: 2; }
+:lang(ar) .qcard.len-short .q-text { font-size: 1.6rem; line-height: 1.7; }
+.featured.len-short .q-text:lang(ar) { font-size: clamp(2.3rem, 5.4vw, 3.9rem); line-height: 1.5; }
+.featured.len-medium .q-text:lang(ar) { font-size: clamp(1.8rem, 3.8vw, 2.7rem); line-height: 1.65; }
+.featured.len-long .q-text:lang(ar) { font-size: clamp(1.25rem, 2.2vw, 1.55rem); line-height: 2.05; }
+.reader-grid .len-short .q-text:lang(ar) { font-size: clamp(2.3rem, 4.4vw, 3.6rem); line-height: 1.5; }
+.reader-grid .len-medium .q-text:lang(ar) { font-size: clamp(1.8rem, 3.2vw, 2.5rem); line-height: 1.65; }
+.reader-grid .len-long .q-text:lang(ar) { font-size: clamp(1.3rem, 2.2vw, 1.55rem); line-height: 2.05; }
+:lang(ar) .reader-title { line-height: 1.5; }
+:lang(ar) .d-title { line-height: 1.5; }
+:lang(ar) .d-excerpt { line-height: 1.9; }
+:lang(ar) .book h3 { line-height: 1.4; }
+:lang(ar) .search-field input::placeholder { font-size: 1.2rem; }
+
+/* Discover: "show more" under a long result list */
+.rec__more{display:flex;flex-direction:column;align-items:center;gap:var(--s-3,.75rem);margin-block:1.5rem}
+.rec__shown{margin:0;color:var(--ink-soft,inherit);font-size:.95rem}
+
+/* Owner-supplied picture on the quote page */
+.reader-art .reader-photo{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}
+</style>
+  <!-- Sets <html lang dir> immediately so the page never flashes in the wrong direction. -->
+  <script>/*
+ * Little Wisdom — interface language layer (English / العربية).
+ * Loaded in <head> so <html lang dir> is correct before the first paint.
+ * Quote content is separate: English in quotes.js, Arabic in quotes-ar.js.
+ *
+ * Usage: I18N.t('key', arg1, arg2)  ·  I18N.lang  ·  I18N.setLang('ar')  ·  I18N.applyStatic()
+ */
+(function (root) {
+  'use strict';
+
+  const STORE_KEY = 'littlewisdom.lang.v1';
+  const DIRS = { en: 'ltr', ar: 'rtl' };
+  const pad = function (n) { return String(n).padStart(2, '0'); };
+
+  /** Saved choice first; otherwise follow the browser (Arabic browsers get Arabic), else English. */
+  function detect() {
+    try {
+      const saved = localStorage.getItem(STORE_KEY);
+      if (saved === 'en' || saved === 'ar') return saved;
+    } catch (e) { /* storage blocked: fall through */ }
+    const nav = (navigator.languages && navigator.languages[0]) || navigator.language || 'en';
+    return /^ar(\b|-)/i.test(nav) ? 'ar' : 'en';
+  }
+
+  /** Arabic has singular, dual, 3–10, and 11+ forms. */
+  function arCount(n, one, two, few, many) {
+    if (n === 1) return one;
+    if (n === 2) return two;
+    return n + ' ' + (n >= 3 && n <= 10 ? few : many);
+  }
+  const arQuotes = function (n) { return arCount(n, 'اقتباس واحد', 'اقتباسان', 'اقتباسات', 'اقتباسًا'); };
+  const enQuotes = function (n) { return n + (n === 1 ? ' quote' : ' quotes'); };
+
+  const STRINGS = {
+    en: {
+      'skip': 'Skip to content',
+      'home.aria': 'Little Wisdom, home',
+      'nav.primary': 'Primary',
+      'nav.search': 'Search',
+      'nav.searchMore': ' quotes',
+      'nav.bookmarks': 'Bookmarks',
+      'lang.label': 'Language',
+      'footer.nav': 'Footer',
+      'footer.closing': 'Make wisdom easy to discover, beautiful to read, and simple to keep.',
+      'footer.home': 'Home',
+      'footer.all': 'All quotes',
+      'footer.bookmarks': 'Your bookmarks',
+      'footer.small': 'Little Wisdom · Illustrations are original drawings made for this site. Bookmarks are stored in this browser only.',
+      'bookmarkCount': function (n) { return n + (n === 1 ? ' saved quote' : ' saved quotes'); },
+      'loadError': 'Sorry, the quotes could not be loaded. Please refresh the page.',
+
+      'greet.morning': 'Good morning', 'greet.day': 'Good afternoon', 'greet.evening': 'Good evening', 'greet.night': 'A quiet night',
+      'season.spring': 'spring', 'season.summer': 'summer', 'season.autumn': 'autumn', 'season.winter': 'winter',
+      'resume': function (n) { return 'Continue where you left off · ' + 'No. ' + pad(n); },
+      'loading': 'Opening…',
+      'hero.hand': 'a small illustrated magazine',
+      'hero.title1': 'Little ',
+      'hero.title2': 'Wisdom',
+      'hero.bubble': 'read slowly…',
+      'hero.lede': 'Meaningful ideas for a life of curiosity, clarity, and purpose.',
+      'hero.collageAria': 'Illustrations: rain at a window, a sunset train ride, a quiet desk',
+      'startWith': function (n) { return 'Start with quote ' + pad(n); },
+      'browseAll': function (n) { return 'Browse all ' + enQuotes(n); },
+      'featured.daily': 'Quote of the day',
+      'featured.plain': 'Featured quote',
+      'quoteNo': function (n) { return 'No. ' + pad(n); },
+      'readQuote': 'Read quote',
+      'showAnother': 'Show another',
+      'cats.title': 'Browse by theme',
+      'cats.sub': 'Seven themes. Pick one to see its quotes.',
+      'categoryCount': function (i, n) { return pad(i) + ' · ' + enQuotes(n); },
+      'selected.title': 'Selected quotes',
+      'keep.title': 'Keep reading',
+      'keep.random': 'Open a random quote',
+      'keep.begin': 'Start at the beginning',
+      'keep.short': 'Quick reads',
+      'keep.long': 'Longer reflections',
+
+      'lib.title': 'All quotes',
+      'lib.intro': 'Search by title, text, or topic, or filter by theme. Open any quote to keep reading from there.',
+      'lib.searchLabel': 'Search quotes',
+      'lib.placeholder': 'Search by title, text, or topic',
+      'lib.filterAria': 'Filter by theme',
+      'lib.allThemes': 'All themes',
+      'lib.tag': 'Tag',
+      'lib.allTags': 'All tags',
+      'lib.source': 'Source',
+      'lib.allSources': 'All sources',
+      'lib.clear': 'Clear filters',
+      'lib.showingAll': function (n) { return 'Showing all ' + enQuotes(n); },
+      'lib.found': function (n) { return n + (n === 1 ? ' quote found' : ' quotes found'); },
+      'lib.emptyTitle': 'No quotes found',
+      'lib.emptyText': 'Try another word, or choose a different theme.',
+
+      'bm.title': 'Your bookmarks',
+      'bm.inLabel': 'your bookmarks',
+      'bm.intro': 'Quotes you saved on this device. They stay in this browser and do not sync to other browsers or devices.',
+      'bm.emptyTitle': 'You haven’t saved any quotes yet',
+      'bm.emptyText': 'Choose “Save quote” on any quote and it will wait for you here.',
+      'nf.title': 'We couldn’t find that page',
+      'nf.text': 'The quote or page you asked for does not exist.',
+
+      'save': 'Save quote',
+      'unsave': 'Remove bookmark',
+      'bookmarkAria': function (title) { return 'Bookmark: ' + title; },
+      'copy': 'Copy quote',
+      'share': 'Share quote',
+      'prev': 'Previous quote',
+      'next': 'Next quote',
+      'quoteNav': 'Quote navigation',
+      'backCollection': 'Back to collection',
+      'backResults': 'Back to results',
+      'backBookmarks': 'Back to bookmarks',
+      'continue': 'Continue reading',
+      'related': 'You might also like',
+      'source': 'Source:',
+      'original': 'Original English',
+      'tagAria': function (tag) { return 'Show quotes tagged ' + tag; },
+      'hint': 'Tip: press the ← and → keys to move between quotes.',
+      'positionWhole': function (i, n) { return 'Quote ' + i + ' of ' + n; },
+      'positionIn': function (i, n, label) { return i + ' of ' + n + ' in ' + label; },
+      'browseInstead': function (n) { return 'Browse all ' + n + ' instead'; },
+      'end.lastIn': function (label) { return 'That was the last quote in ' + label + '. '; },
+      'end.last': 'You have reached the last quote. ',
+      'end.restart': 'Start again from quote 01',
+      'end.firstIn': function (label) { return 'This is the first quote in ' + label + '.'; },
+      'end.first': 'This is the first quote.',
+      'q': function (s) { return '“' + s + '”'; },
+
+      'toast.saved': 'Saved to bookmarks.',
+      'toast.removed': 'Removed from bookmarks.',
+      'toast.noStorage': 'Saved for this visit only. Your browser blocked storage.',
+      'toast.copied': 'Quote copied.',
+      'toast.copyFail': 'Could not copy. Select the text and copy it manually.',
+      'toast.linkCopied': 'Quote and link copied.',
+      'toast.lang': 'Switched to English.',
+      'title.home': 'Little Wisdom',
+      'nav.discover': 'Discover',
+      'footer.discover': 'Discover what you need',
+      'title.disc': 'Discover what you need · Little Wisdom',
+      'backDiscover': 'Back to recommendations',
+      'disc.title': 'Discover what you need',
+      'disc.lede': 'Tell us how you feel, or what you would like to learn, and we will bring you quotes from the collection.',
+      'disc.feelQ': 'How are you feeling today?',
+      'disc.topicQ': 'What would you like to learn about?',
+      'disc.feelGroup': 'Choose a feeling',
+      'disc.topicGroup': 'Choose a topic',
+      'disc.feelFor': function (x) { return 'For when you feel ' + x.toLowerCase(); },
+      'disc.topicFor': function (x) { return 'Learning about ' + x.toLowerCase(); },
+      'disc.count': function (n) { return n + (n === 1 ? ' quote for you' : ' quotes for you'); },
+      'disc.few': function (n) { return n === 1 ? 'Only one entry matches this so far.' : 'Only ' + n + ' entries match this so far.'; },
+      'disc.none': 'No entries match this yet.',
+      'disc.tryInstead': 'These have entries you can read right now',
+      'disc.shown': function (a, b) { return 'Showing ' + a + ' of ' + b; },
+      'disc.more': function (n) { return 'Show ' + n + ' more'; },
+      'disc.related': 'Explore next',
+      'disc.another': 'Choose something else',
+      'disc.note': 'These quotes are ideas for reflection and encouragement. They are not medical or mental-health advice. If things feel heavy, please talk to someone you trust or to a professional.',
+      'disc.homeTitle': 'Discover what you need',
+      'disc.homeSub': 'Not sure what to read? Start from how you feel, or what you want to learn.',
+      'disc.seeAll': 'See all options',
+      'title.lib': 'All quotes · Little Wisdom',
+      'title.bm': 'Your bookmarks · Little Wisdom',
+      'title.nf': 'Not found · Little Wisdom'
+    },
+
+    ar: {
+      'skip': 'تخطَّ إلى المحتوى',
+      'home.aria': 'Little Wisdom، الصفحة الرئيسية',
+      'nav.primary': 'التنقل الرئيسي',
+      'nav.search': 'ابحث',
+      'nav.searchMore': ' في الاقتباسات',
+      'nav.bookmarks': 'المحفوظات',
+      'lang.label': 'اللغة',
+      'footer.nav': 'روابط أسفل الصفحة',
+      'footer.closing': 'اجعل الحكمة سهلة الاكتشاف، جميلة القراءة، بسيطة الحفظ.',
+      'footer.home': 'الرئيسية',
+      'footer.all': 'كل الاقتباسات',
+      'footer.bookmarks': 'محفوظاتك',
+      'footer.small': 'Little Wisdom · الرسومات أصلية، رُسمت لهذا الموقع خصيصًا. تبقى المحفوظات في هذا المتصفح فقط.',
+      'bookmarkCount': function (n) { return 'عدد المحفوظات: ' + n; },
+      'loadError': 'للأسف تعذّر تحميل الاقتباسات. حدّث الصفحة وحاول مرة أخرى.',
+
+      'greet.morning': 'صباح الخير', 'greet.day': 'نهارك سعيد', 'greet.evening': 'مساء الخير', 'greet.night': 'ليلة هادئة',
+      'season.spring': 'الربيع', 'season.summer': 'الصيف', 'season.autumn': 'الخريف', 'season.winter': 'الشتاء',
+      'resume': function (n) { return 'تابع من حيث توقفت · رقم ' + pad(n); },
+      'loading': 'لحظة…',
+      'hero.hand': 'مجلة صغيرة مصوّرة',
+      'hero.title1': 'حكمة ',
+      'hero.title2': 'صغيرة',
+      'hero.bubble': 'اقرأ على مهلك…',
+      'hero.lede': 'أفكار ذات معنى لحياة مليئة بالفضول والوضوح والهدف.',
+      'hero.collageAria': 'رسومات: مطر على نافذة، وغروب من قطار، ومكتب هادئ',
+      'startWith': function (n) { return 'ابدأ من الاقتباس ' + pad(n); },
+      'browseAll': function () { return 'تصفّح كل الاقتباسات'; },
+      'featured.daily': 'اقتباس اليوم',
+      'featured.plain': 'اقتباس مميّز',
+      'quoteNo': function (n) { return 'رقم ' + pad(n); },
+      'readQuote': 'اقرأ الاقتباس',
+      'showAnother': 'اعرض اقتباسًا آخر',
+      'cats.title': 'تصفّح حسب الموضوع',
+      'cats.sub': 'سبعة مواضيع. اختر موضوعًا لتطّلع على اقتباساته.',
+      'categoryCount': function (i, n) { return pad(i) + ' · ' + arQuotes(n); },
+      'selected.title': 'اقتباسات مختارة',
+      'keep.title': 'تابع القراءة',
+      'keep.random': 'افتح اقتباسًا عشوائيًا',
+      'keep.begin': 'ابدأ من البداية',
+      'keep.short': 'قراءات سريعة',
+      'keep.long': 'تأملات أطول',
+
+      'lib.title': 'كل الاقتباسات',
+      'lib.intro': 'ابحث بالعنوان أو النص أو الموضوع، أو صفِّ النتائج حسب الموضوع. افتح أي اقتباس وتابع القراءة منه.',
+      'lib.searchLabel': 'ابحث في الاقتباسات',
+      'lib.placeholder': 'ابحث بالعنوان أو النص أو الموضوع',
+      'lib.filterAria': 'تصفية حسب الموضوع',
+      'lib.allThemes': 'كل المواضيع',
+      'lib.tag': 'الوسم',
+      'lib.allTags': 'كل الوسوم',
+      'lib.source': 'المصدر',
+      'lib.allSources': 'كل المصادر',
+      'lib.clear': 'إلغاء التصفية',
+      'lib.showingAll': function (n) { return 'عرض كل الاقتباسات (' + n + ')'; },
+      'lib.found': function (n) { return n === 1 ? 'وجدنا اقتباسًا واحدًا' : n === 2 ? 'وجدنا اقتباسين' : 'وجدنا ' + (n >= 3 && n <= 10 ? n + ' اقتباسات' : n + ' اقتباسًا'); },
+      'lib.emptyTitle': 'لم نجد أي اقتباس',
+      'lib.emptyText': 'جرّب كلمة أخرى، أو اختر موضوعًا مختلفًا.',
+
+      'bm.title': 'محفوظاتك',
+      'bm.inLabel': 'محفوظاتك',
+      'bm.intro': 'الاقتباسات التي حفظتها على هذا الجهاز. تبقى في هذا المتصفح فقط، ولا تنتقل إلى متصفحات أو أجهزة أخرى.',
+      'bm.emptyTitle': 'لم تحفظ أي اقتباس بعد',
+      'bm.emptyText': 'اضغط «احفظ الاقتباس» على أي اقتباس، وسيبقى هنا في انتظارك.',
+      'nf.title': 'لم نجد هذه الصفحة',
+      'nf.text': 'الاقتباس أو الصفحة التي طلبتها غير موجودة.',
+
+      'save': 'احفظ الاقتباس',
+      'unsave': 'احذف من المحفوظات',
+      'bookmarkAria': function (title) { return 'احفظ: ' + title; },
+      'copy': 'انسخ الاقتباس',
+      'share': 'شارك الاقتباس',
+      'prev': 'الاقتباس السابق',
+      'next': 'الاقتباس التالي',
+      'quoteNav': 'التنقل بين الاقتباسات',
+      'backCollection': 'الرجوع للمجموعة',
+      'backResults': 'الرجوع للنتائج',
+      'backBookmarks': 'الرجوع للمحفوظات',
+      'continue': 'تابع القراءة',
+      'related': 'قد يعجبك أيضًا',
+      'source': 'المصدر:',
+      'original': 'النص الأصلي بالإنجليزية',
+      'tagAria': function (tag) { return 'اعرض الاقتباسات بوسم ' + tag; },
+      'hint': 'نصيحة: استخدم مفتاحي السهم الأيمن والأيسر للتنقل بين الاقتباسات.',
+      'positionWhole': function (i, n) { return 'اقتباس ' + i + ' من ' + n; },
+      'positionIn': function (i, n, label) { return i + ' من ' + n + ' في ' + label; },
+      'browseInstead': function () { return 'تصفّح كل الاقتباسات بدلًا من ذلك'; },
+      'end.lastIn': function (label) { return 'هذا آخر اقتباس في ' + label + '. '; },
+      'end.last': 'وصلت إلى آخر اقتباس. ',
+      'end.restart': 'ابدأ من جديد من الاقتباس 01',
+      'end.firstIn': function (label) { return 'هذا أول اقتباس في ' + label + '.'; },
+      'end.first': 'هذا أول اقتباس.',
+      'q': function (s) { return '«' + s + '»'; },
+
+      'toast.saved': 'تم الحفظ في المحفوظات.',
+      'toast.removed': 'تم الحذف من المحفوظات.',
+      'toast.noStorage': 'تم الحفظ لهذه الزيارة فقط. منع المتصفح التخزين.',
+      'toast.copied': 'تم نسخ الاقتباس.',
+      'toast.copyFail': 'تعذّر النسخ. حدّد النص وانسخه يدويًا.',
+      'toast.linkCopied': 'تم نسخ الاقتباس والرابط.',
+      'toast.lang': 'تم التبديل إلى العربية.',
+      'title.home': 'حكمة صغيرة · Little Wisdom',
+      'nav.discover': 'اكتشف',
+      'footer.discover': 'اكتشف ما تحتاجه',
+      'title.disc': 'اكتشف ما تحتاجه · Little Wisdom',
+      'backDiscover': 'الرجوع إلى التوصيات',
+      'disc.title': 'اكتشف ما تحتاجه',
+      'disc.lede': 'أخبرنا كيف تشعر، أو ما تريد أن تتعلمه، وسنعرض لك اقتباسات من المجموعة.',
+      'disc.feelQ': 'كيف تشعر اليوم؟',
+      'disc.topicQ': 'عمّ تريد أن تتعلم؟',
+      'disc.feelGroup': 'اختر شعورًا',
+      'disc.topicGroup': 'اختر موضوعًا',
+      'disc.feelFor': function (x) { return 'حين تشعر ب' + x; },
+      'disc.topicFor': function (x) { return 'للتعلّم عن ' + x; },
+      'disc.count': function (n) { return n === 1 ? 'اقتباس واحد لك' : n === 2 ? 'اقتباسان لك' : (n >= 3 && n <= 10 ? n + ' اقتباسات لك' : n + ' اقتباسًا لك'); },
+      'disc.few': function (n) { return n === 1 ? 'يوجد حتى الآن اقتباس واحد فقط مطابق.' : n === 2 ? 'يوجد حتى الآن اقتباسان فقط مطابقان.' : 'يوجد حتى الآن ' + n + ' اقتباسات فقط مطابقة.'; },
+      'disc.none': 'لا توجد اقتباسات مطابقة حتى الآن.',
+      'disc.tryInstead': 'هذه الخيارات فيها اقتباسات يمكنك قراءتها الآن',
+      'disc.shown': function (a, b) { return 'يُعرض ' + a + ' من ' + b; },
+      'disc.more': function (n) { return 'اعرض ' + n + ' أخرى'; },
+      'disc.related': 'تابع الاستكشاف',
+      'disc.another': 'اختر شيئًا آخر',
+      'disc.note': 'هذه الاقتباسات أفكار للتأمل والتشجيع، وليست نصيحة طبية أو علاجًا نفسيًا. إذا كان ما تشعر به ثقيلًا، فتحدث إلى شخص تثق به أو إلى مختص.',
+      'disc.homeTitle': 'اكتشف ما تحتاجه',
+      'disc.homeSub': 'لا تدري ماذا تقرأ؟ ابدأ من شعورك، أو مما تريد أن تتعلمه.',
+      'disc.seeAll': 'عرض كل الخيارات',
+      'title.lib': 'كل الاقتباسات · Little Wisdom',
+      'title.bm': 'محفوظاتك · Little Wisdom',
+      'title.nf': 'غير موجود · Little Wisdom'
+    }
+  };
+
+  const I18N = {
+    lang: detect(),
+    dir: function () { return DIRS[this.lang]; },
+    t: function (key) {
+      const table = STRINGS[I18N.lang] || STRINGS.en;
+      let value = table[key];
+      if (value === undefined) value = STRINGS.en[key];
+      if (value === undefined) return key; // visible during development, never crashes
+      return typeof value === 'function' ? value.apply(null, Array.prototype.slice.call(arguments, 1)) : value;
+    },
+    /** Reflect the current language on <html> so CSS (:lang, [dir]) and assistive tech follow. */
+    syncDocument: function () {
+      document.documentElement.lang = I18N.lang;
+      document.documentElement.dir = DIRS[I18N.lang];
+    },
+    setLang: function (lang) {
+      if (!DIRS[lang]) return;
+      I18N.lang = lang;
+      try { localStorage.setItem(STORE_KEY, lang); } catch (e) { /* the choice still applies for this visit */ }
+      I18N.syncDocument();
+    },
+    /** Fill static markup: data-i18n="key" sets text; data-i18n-attr="aria-label:key;title:key". */
+    applyStatic: function (scope) {
+      const root = scope || document;
+      root.querySelectorAll('[data-i18n]').forEach(function (el) { el.textContent = I18N.t(el.getAttribute('data-i18n')); });
+      root.querySelectorAll('[data-i18n-attr]').forEach(function (el) {
+        el.getAttribute('data-i18n-attr').split(';').forEach(function (pair) {
+          const i = pair.indexOf(':');
+          if (i > 0) el.setAttribute(pair.slice(0, i).trim(), I18N.t(pair.slice(i + 1).trim()));
+        });
+      });
+    }
+  };
+
+  I18N.syncDocument();
+  root.I18N = I18N;
+})(window);
+</script>
+</head>
+<body>
+  <a class="skip-link" href="#main" data-i18n="skip">Skip to content</a>
+
+  <header class="site-header">
+    <div class="wrap nav">
+      <a class="logo" href="#/" data-i18n-attr="aria-label:home.aria" aria-label="Little Wisdom, home">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="3" width="26" height="26" rx="6" fill="currentColor"/><circle cx="16" cy="16" r="6.500" fill="none" stroke="#f5eedf" stroke-width="2" stroke-dasharray="34 8" stroke-linecap="round" transform="rotate(-60 16 16)"/></svg>
+        <span lang="en">Little Wisdom</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary" data-i18n-attr="aria-label:nav.primary">
+        <a class="nav-link" href="#/discover" data-nav="discover"><span data-i18n="nav.discover">Discover</span></a>
+        <a class="nav-link" href="#/library?focus=1" data-nav="library">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.500-3.500"/></svg>
+          <span><span data-i18n="nav.search">Search</span><span class="label-long" data-i18n="nav.searchMore"> quotes</span></span>
+        </a>
+        <a class="nav-link" href="#/bookmarks" data-nav="bookmarks">
+          <span data-i18n="nav.bookmarks">Bookmarks</span><span class="count-badge" id="bookmark-count" aria-label="0 saved quotes">0</span>
+        </a>
+      </nav>
+      <div class="lang-switch" role="group" aria-label="Language" data-i18n-attr="aria-label:lang.label">
+        <button type="button" class="lang-btn" data-lang="en" lang="en" aria-pressed="true">English</button>
+        <button type="button" class="lang-btn" data-lang="ar" lang="ar" aria-pressed="false">العربية</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1"><div id="app" class="view"><p class="loading" data-i18n="loading">Opening…</p></div></main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <p class="closing" data-i18n="footer.closing">Make wisdom easy to discover, beautiful to read, and simple to keep.</p>
+        <nav aria-label="Footer" data-i18n-attr="aria-label:footer.nav">
+          <ul>
+            <li><a href="#/" data-i18n="footer.home">Home</a></li>
+            <li><a href="#/discover" data-i18n="footer.discover">Discover what you need</a></li>
+            <li><a href="#/library" data-i18n="footer.all">All quotes</a></li>
+            <li><a href="#/bookmarks" data-i18n="footer.bookmarks">Your bookmarks</a></li>
+          </ul>
+        </nav>
+      </div>
+      <small data-i18n="footer.small">Little Wisdom · Illustrations are original drawings made for this site. Bookmarks are stored in this browser only.</small>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <noscript><p class="wrap" style="padding:3rem 0">Little Wisdom needs JavaScript to display its quotes. · يحتاج الموقع إلى JavaScript لعرض الاقتباسات.</p></noscript>
+
+  <script>/*
+ * Little Wisdom — the single source of truth for all quote content.
+ *
+ * Titles and text are authoritative and must never be paraphrased.
+ * Categories, tags and image keys are editorial metadata added for navigation.
+ * `author` and `sourceUrl` are intentionally empty: no attribution was supplied,
+ * and none is invented. Fill them in only with verified information.
+ */
+(function (root) {
+  'use strict';
+
+  const CATEGORIES = [
+    { id: 'life',       name: 'Life & Growth',          blurb: 'Falling, rising, and becoming.' },
+    { id: 'discipline', name: 'Discipline & Focus',     blurb: 'Doing what matters, ignoring the rest.' },
+    { id: 'learning',   name: 'Learning & Wisdom',      blurb: 'Questions, mistakes, and understanding.' },
+    { id: 'creativity', name: 'Creativity & Work',      blurb: 'Making things and building your own.' },
+    { id: 'people',     name: 'People & Relationships', blurb: 'How we speak, listen, and expect.' },
+    { id: 'time',       name: 'Time & Goals',           blurb: 'Where your hours go, and where they lead.' },
+    { id: 'faith',      name: 'Faith & Perspective',    blurb: 'Trust, fear, and the long view.' }
+  ];
+
+  // Illustrations rotate through all seven scenes by quote number, so neighbouring quotes
+  // never share a picture and every scene is used about equally. (Mapping by category
+  // repeated the same scene across a whole row.) A record may still override `image`.
+  const SCENE_ORDER = ['window', 'rain', 'desk', 'train', 'morning', 'night', 'season'];
+
+  // [number, title, text, categories, tags]
+  const RAW = [
+    [1, `Be the Only One`, `Be the only one, not the best one.`, ['life', 'creativity'], ['identity', 'originality']],
+    [2, `Enjoy the Difficult Times`, `Sometimes, you have to enjoy the difficult times.`, ['life'], ['resilience', 'perspective']],
+    [3, `Passion`, `Passion is about what you hope to accomplish.`, ['creativity'], ['passion', 'purpose']],
+    [4, `Selling`, `Selling is about problems and solutions.`, ['creativity'], ['sales', 'problem-solving']],
+    [5, `Tell Them`, `If you see something beautiful in someone, tell them. And if you see something bad in someone, tell them.`, ['people'], ['honesty', 'kindness']],
+    [6, `Do More of One Thing`, `Don't do more things. Do more of one thing.`, ['discipline'], ['focus', 'mastery']],
+    [7, `Discipline and Focus`, `Discipline is doing what matters. Focus is ignoring what doesn't matter.`, ['discipline'], ['discipline', 'focus']],
+    [8, `Fear and Faith`, `Fear is “What if?” Faith is “Even if.”`, ['faith'], ['fear', 'faith']],
+    [9, `Why Isn't It Working?`, `Two reasons why it's not working: your system is broken, or your strategy is broken.`, ['discipline', 'creativity'], ['systems', 'strategy']],
+    [10, `Organize Your Life`, `Nobody is coming to organize your life for you.`, ['life', 'discipline'], ['responsibility', 'order']],
+    [11, `Avoid Shortcuts`, `Avoid shortcuts that destroy the goal.`, ['discipline', 'time'], ['integrity', 'goals']],
+    [12, `Responding to Insults`, `1. Are you okay?\n2. Did you say that to upset me?\n3. Do you realize what that says about you?`, ['people'], ['composure', 'respect']],
+    [13, `Just Do It`, `If it's good for you, just DO it.`, ['discipline'], ['action', 'habits']],
+    [14, `Get Back Up`, `Life is about HOW we get back up after we fall.`, ['life'], ['resilience', 'failure']],
+    [15, `Learn What You Don't Know`, `The goal is not learning everything. The goal is learning what you do not know.`, ['learning'], ['curiosity', 'knowledge']],
+    [16, `The Unknown`, `“People are enemies of what they do not know.”`, ['people', 'learning'], ['fear', 'understanding']],
+    [17, `Your Time Is Limited`, `Your time is limited. You have to decide where to spend your time. You have to say, “I will spend my time here,” or “I will not.”`, ['time'], ['priorities', 'time']],
+    [18, `Start Creating`, `Switch from watching to creating.`, ['creativity'], ['creating', 'making']],
+    [19, `Expectations`, `Most people don't disappoint you; you disappoint yourself by expecting more than they can give.`, ['people'], ['expectations', 'self-awareness']],
+    [20, `Read Yourself`, `Read yourself.`, ['learning', 'life'], ['self-awareness', 'reflection']],
+    [21, `Discover the Wisdom`, `Happiness is discovering the wisdom behind what Allah created, understanding how things work and their benefits, and finding ways to make them simpler, smarter, and more beautiful.`, ['faith', 'learning', 'creativity'], ['happiness', 'wisdom', 'design']],
+    [22, `Spend Your Time Wisely`, `You will become great at the things you want to spend your time on.`, ['time', 'learning'], ['mastery', 'priorities']],
+    [23, `Take Back Your Time`, `Wake up early = Your day feels twice as long!\n\nStay away from your phone = One hour feels like two!`, ['time', 'discipline'], ['habits', 'phone', 'mornings']],
+    [24, `Watch Him`, `If you want to change something in your life\n\nWatch him.`, ['life'], ['change', 'example']],
+    [25, `Build Your Skills`, `The more skills you have, the more humans will need you, and the less you will need humans.`, ['creativity', 'learning'], ['skills', 'independence']],
+    [26, `Learn by Asking`, `To learn, you have to ask questions, make mistakes, and combine the data from what you are learning.`, ['learning'], ['questions', 'mistakes', 'learning']],
+    [27, `Do What You Avoid`, `Wisdom is about doing what you do not want to do.`, ['discipline', 'learning'], ['discipline', 'wisdom']],
+    [28, `Think Before Asking AI`, `First, ask yourself, “HOW CAN I make this task easy, smart, simple, and beautiful?” Then ask AI. Try to think first.`, ['learning', 'creativity'], ['ai', 'thinking']],
+    [29, `Turn to Allah`, `Your feelings come from Allah, so Allah is the only one who can help you avoid and get through those feelings.`, ['faith'], ['feelings', 'trust']],
+    [30, `Glory Takes Endurance`, `“He who seeks glory does not ask for comfort; the fires of glory demand someone who endures them.”`, ['discipline', 'life'], ['endurance', 'glory']],
+    [31, `Speak So People Understand`, `“The strongest of people in mind and the purest of them in soul is the one who speaks to people according to the level of their understanding.”`, ['people', 'learning'], ['communication', 'understanding']],
+    [32, `Start Where You Are`, `“The timing will never be just right. Start where you stand, and work with whatever tools you may have at your command, and better tools will be found as you go along.”`, ['time', 'life'], ['beginnings', 'action']],
+    [33, `Let Them Think`, `Let them think what they want, because people only hear what they want to hear and think what they want to think.`, ['people'], ['boundaries', 'perspective']],
+    [34, `The Truth Can Hurt`, `The truth will set you free, but first, it'll piss you off.`, ['life', 'people'], ['truth', 'growth']],
+    [35, `Start Small`, `“Start messy. Start small.”`, ['time', 'creativity'], ['beginnings', 'action']],
+    [36, `Care and Honesty`, `“No one jokes with you except the one who loves you, no one reproaches you except the one who cherishes you, and no one checks up on you except the one who truly loves you.”`, ['people'], ['love', 'honesty']],
+    [37, `Better Days`, `“When life gets hard, it means something better is coming.”`, ['life', 'faith'], ['hope', 'hard-times']],
+    [38, `Learn from Others`, `“Only a fool learns from his own mistakes. The wise man learns from the mistakes of others.”`, ['learning'], ['mistakes', 'wisdom']],
+    [39, `Hard Times`, `“Hard times test you, not kill you.”`, ['life'], ['hard-times', 'resilience']],
+    [40, `Success and Failure`, `“Success hugs you in private. Failure slaps you in public. That's life!”`, ['life'], ['success', 'failure']],
+    [41, `Learn by Doing`, `Teach me, and I remember. Involve me, and I learn.`, ['learning'], ['teaching', 'practice']],
+    [42, `Trust Allah`, `Remember, nothing is in your hands; everything is in Allah's hands.`, ['faith'], ['trust', 'surrender']],
+    [43, `Build Your Own Dream`, `If you do not build your own dream, someone else will hire you to help build theirs.`, ['creativity', 'time'], ['dreams', 'work']],
+    [44, `Ask to Understand`, `If you do not understand, ask questions to understand. Do not be stupid.`, ['learning'], ['questions', 'understanding']],
+    [45, `Love What You Do`, `The only way to do great work is to love what you do.`, ['creativity'], ['love', 'work']],
+    [46, `Find a Way`, `“If you really want to do something, you will find a way. If you don't, you will find an excuse.”`, ['discipline', 'time'], ['excuses', 'determination']],
+    [47, `Use Your Free Time`, `“When you quit an addiction, the first thing you will face is thinking about it during your free time. If you kill the free time, you win!”`, ['discipline'], ['addiction', 'habits']],
+    [48, `Look for Solutions`, `Look for solutions, not just answers.`, ['learning', 'creativity'], ['solutions', 'thinking']],
+    [49, `Know When to Start and Stop`, `“We humans suffer from two major problems: the first is knowing when to start, and the second is knowing when to stop.”`, ['discipline', 'life'], ['beginnings', 'restraint']],
+    [50, `Seize Opportunities`, `“Opportunities are created to be seized immediately.”`, ['time'], ['opportunity', 'action']],
+    [51, `Build Your Own Dream`, `Don't be busy watching other humans make money and achieve their dreams through your time while you avoid your own hard work.`, ['creativity', 'time'], ['dreams', 'time']],
+    [52, `Take Action`, `QUOTES WON'T WORK UNLESS YOU DO.`, ['discipline'], ['action', 'quotes']],
+    [53, `Work Toward Your Goals`, `To achieve your goals, you have to study or work every single hour of the day that you aren't eating, praying, going to the gym, spending time with your friends, or attending class. If you work or study harder than everyone else, you can get what you want.`, ['time', 'discipline'], ['study', 'hard-work']],
+    [54, `Live for Yourself`, `Are you living for you?`, ['life'], ['identity', 'choices']],
+    [55, `Tell Yourself What You Need to Hear`, `Tell Yourself What You Need to Hear.`, ['life'], ['self-talk', 'identity']],
+    [56, `Patience`, `Figuring out what to do in the meantime. Aka - doing anything besides the thing you're avoiding, including nothing at all.`, ['discipline', 'time'], ['restraint', 'action']],
+    [57, `Intelligence`, `How fast you change what you do in the same situation.\nAka “rate of learning”.`, ['learning'], ['learning', 'change']],
+    [58, `Learning`, `Same thing happens, you respond differently. “Same condition - new behavior”.`, ['learning'], ['learning', 'change']],
+    [59, `Work Ethic`, `To work hard, think about the outcome instead of the pain.`, ['discipline'], ['hard-work', 'determination']],
+    [60, `How to Be Productive`, `Don't do anything besides the task you set out to complete.`, ['discipline'], ['focus', 'action']],
+    [61, `Learning`, `Connect new knowledge to something familiar or something you already know.`, ['learning'], ['learning', 'knowledge']],
+    [62, `Framing`, `How you look at a situation changes how you experience it. Ask yourself: How can I make this situation amazing, smarter, easier, or more beneficial?`, ['faith'], ['perspective', 'thinking']],
+    [63, `Goal Achievement`, `Ask yourself: What is the one thing I could do that would guarantee I fail to achieve my goal? Then flip it around and do the opposite to move toward success.`, ['time'], ['goals', 'thinking']],
+    [64, `Understanding Instructions`, `“Understand the level of detail in the instructions.”`, ['learning'], ['understanding']],
+    [65, `Faith and Self-Control`, `“When you feel the urge to do a bad habit, remember that this test comes from Allah. If He created this feeling to test me, then He is the only One who can help me go through it and break it.”`, ['faith'], ['faith', 'restraint', 'habits']],
+    [66, `Product Value`, `Your product must be unique, meaning others cannot sell it; sticky, meaning people keep buying it over time; and expensive, meaning you can charge way more than it costs you to deliver it.`, ['creativity'], ['sales', 'originality']],
+    [67, `Personal Development`, `Fill your bucket with:\n\nNumber 1: Knowledge — what you know.\nNumber 2: Skills — what you know how to do.\nNumber 3: Environment — the things that influence your behavior, including who and what you surround yourself with.`, ['life'], ['growth', 'knowledge', 'skills']],
+    [68, `Productise Yourself`, `To “productise yourself” means to identify what you naturally do best and scale it into a product that the world and humans find valuable and helpful to use.`, ['creativity'], ['skills', 'making']],
+    [69, `Integrity`, `“Stay straight, even if the wrong path is tempting.”`, ['life'], ['integrity', 'choices']],
+    [70, `Perspective`, `“If you blow things out of proportion, they will grow; if you downplay them, they will shrink.”`, ['faith'], ['perspective', 'thinking']],
+    [71, `Authenticity`, `“The wider the gap becomes between who you truly are and who you pretend to be, the more it will be filled with sadness, depression, and a sense of shame.”`, ['life'], ['identity', 'feelings']],
+    [72, `Patience`, `“Be patient, and you'll get something high quality.”`, ['discipline', 'time'], ['restraint', 'endurance']],
+    [73, `Learning`, `It about breaking it down what you want learn into smaller and smaller constituent parts so that you can get it into an understandable unit that you can change your behavior.`, ['learning'], ['learning', 'behavior', 'understanding', 'change', 'practice']],
+    [74, `Observe the Behaviors`, `If someone can’t tell you what to do with either your mouth or your body they are not giving you clear directions to succeed\nObserve the behaviors .`, ['learning'], ['observation', 'behavior', 'understanding', 'learning', 'communication']],
+    [75, `Don't copy someone else's plan or tips`, `"Try to build your own, even if it's messy and imperfect."\n"Pick the pieces that make sense for your life."\n"Put them together yourself."`, ['life', 'creativity'], ['originality', 'independence', 'identity', 'making', 'choices']],
+    [76, `Understand WHY you feel an emotion`, `Insult: My self-image or sense of respect feels threatened.\nAnger: Something seems unfair, wrong, or against my boundaries.\nAnxiety: I feel uncertain about the future.\nStress: I have too many demands and not enough time, energy, skills, or support.\nFear: Something feels threatening.\nOverthinking: I keep analyzing what could happen and struggle to stop.`, ['life', 'learning'], ['feelings', 'self-awareness', 'reflection', 'understanding']],
+    [77, `Life Is Beautiful`, `"Life is beautiful, but some people make it miserable."`, ['people', 'life'], ['perspective']],
+    [78, `Think Before You Decide`, `"Before making any decision, consider your finances, religion, health, family, facts, and risks. All of these should be part of your equation."`, ['life'], ['choices', 'thinking', 'wisdom', 'priorities']],
+    [79, `When You Feel Lonely`, `Go outside and observe what Allah has created. Discover the wisdom behind things, understand their purpose and benefits, and ask yourself:\n\nWhy did Allah create this?\nWhat benefits does it bring?\nHow does it work?\nHow could I improve it?\nWhat else could I use it for?`, ['faith', 'learning'], ['loneliness', 'curiosity', 'questions', 'wisdom', 'reflection']],
+    [80, `Ten Years in Six Months`, `“Stop being patient and start asking yourself, how do I accomplish my 10-year plan in 6 months? You will probably fail but you will be a lot further ahead of the person who simply accepted it was going to take 10 years.”`, ['time', 'discipline'], ['goals', 'determination', 'action', 'hard-work', 'success']],
+    [81, `Today Is a Gift`, `Yesterday is history, Tomorrow is a mystery, but Today is a gift, that is why it is called the Present.`, ['time', 'life'], ['gratitude', 'perspective', 'time']],
+    [82, `Unique and Sticky`, `"Make your product unique so you can set your own price, and make it sticky enough that customers keep coming back."`, ['creativity'], ['sales', 'strategy', 'originality']]
+  ];
+
+  const QUOTES = RAW.map(function (r) {
+    return {
+      id: 'q' + String(r[0]).padStart(2, '0'),
+      number: r[0],
+      title: r[1],
+      text: r[2],
+      categories: r[3],
+      tags: r[4],
+      author: '',
+      sourceUrl: '',
+      image: SCENE_ORDER[(r[0] - 1) % SCENE_ORDER.length],
+      published: true
+    };
+  });
+
+  root.CATEGORIES = CATEGORIES;
+  root.QUOTES = QUOTES;
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+  <script>/*
+ * Little Wisdom — Arabic layer (Modern Standard Arabic, simplified).
+ *
+ * The English quotes in quotes.js are never modified. This file only ADDS an Arabic
+ * translation (title + text) for each quote id, plus Arabic names for categories and tags.
+ *
+ * Register: clear, simple Modern Standard Arabic (الفصحى المبسّطة) that a reader from any
+ * Arabic-speaking country can follow: short sentences, common words, no dialect, no slang,
+ * no rare or archaic vocabulary. Meaning is kept as close to the English as the language allows.
+ * Line breaks match the English line for line. Quoted speech uses « ».
+ *
+ * These are careful translations, but a native reader should still review them before publishing.
+ * Open questions are listed in TRANSLATION_NOTES.md.
+ */
+(function (root) {
+  'use strict';
+
+  const QUOTES_AR = {
+    q01: { title: `كن الوحيد`, text: `كن الوحيد، لا الأفضل.` },
+    q02: { title: `استمتع بالأوقات الصعبة`, text: `أحيانًا، عليك أن تستمتع بالأوقات الصعبة.` },
+    q03: { title: `الشغف`, text: `الشغف هو ما تأمل أن تحققه.` },
+    q04: { title: `البيع`, text: `البيع قائم على المشكلات والحلول.` },
+    q05: { title: `قل له`, text: `إذا رأيت شيئًا جميلًا في شخص، فقل له. وإذا رأيت شيئًا سيئًا في شخص، فقل له أيضًا.` },
+    q06: { title: `افعل شيئًا واحدًا أكثر`, text: `لا تفعل أشياء أكثر. افعل شيئًا واحدًا أكثر.` },
+    q07: { title: `الانضباط والتركيز`, text: `الانضباط هو أن تفعل ما يهم. والتركيز هو أن تتجاهل ما لا يهم.` },
+    q08: { title: `الخوف والإيمان`, text: `الخوف هو «ماذا لو؟». والإيمان هو «حتى لو».` },
+    q09: { title: `لماذا لا ينجح الأمر؟`, text: `هناك سببان لعدم نجاح الأمر: إما أن نظامك به خلل، أو أن استراتيجيتك بها خلل.` },
+    q10: { title: `رتّب حياتك`, text: `لن يأتي أحد ليرتّب حياتك من أجلك.` },
+    q11: { title: `تجنّب الطرق المختصرة`, text: `تجنّب الطرق المختصرة التي تُفسد الهدف.` },
+    q12: { title: `الرد على الإهانات`, text: `1. هل أنت بخير؟\n2. هل قلت ذلك لتزعجني؟\n3. هل تدرك ما يقوله ذلك عنك؟` },
+    q13: { title: `افعله فحسب`, text: `إذا كان في مصلحتك، فافعله فحسب.` },
+    q14: { title: `انهض من جديد`, text: `الحياة هي كيف ننهض بعد أن نسقط.` },
+    q15: { title: `تعلّم ما لا تعرفه`, text: `الهدف ليس تعلّم كل شيء. الهدف هو تعلّم ما لا تعرفه.` },
+    q16: { title: `المجهول`, text: `«الناس أعداء ما لا يعرفونه.»` },
+    q17: { title: `وقتك محدود`, text: `وقتك محدود. عليك أن تقرر أين تقضيه. عليك أن تقول: «سأقضي وقتي هنا»، أو «لن أقضي وقتي هنا».` },
+    q18: { title: `ابدأ بالإبداع`, text: `انتقل من المشاهدة إلى الإبداع.` },
+    q19: { title: `التوقعات`, text: `معظم الناس لا يخذلونك؛ أنت من يخذل نفسه حين يتوقع منهم أكثر مما يستطيعون أن يقدّموه.` },
+    q20: { title: `اقرأ نفسك`, text: `اقرأ نفسك.` },
+    q21: { title: `اكتشف الحكمة`, text: `السعادة هي اكتشاف الحكمة وراء ما خلقه الله، وفهم كيف تعمل الأشياء وما فيها من فوائد، وإيجاد طرق تجعلها أبسط وأذكى وأجمل.` },
+    q22: { title: `اقضِ وقتك بحكمة`, text: `ستصبح بارعًا في الأشياء التي تريد أن تقضي وقتك فيها.` },
+    q23: { title: `استعد وقتك`, text: `استيقظ مبكرًا = يبدو يومك ضعف طوله!\n\nابتعد عن هاتفك = تبدو الساعة ساعتين!` },
+    q24: { title: `راقبه`, text: `إذا أردت أن تغيّر شيئًا في حياتك\n\nراقبه.` },
+    q25: { title: `طوّر مهاراتك`, text: `كلما زادت مهاراتك، زادت حاجة الناس إليك، وقلّت حاجتك إليهم.` },
+    q26: { title: `تعلّم بالسؤال`, text: `لكي تتعلم، عليك أن تطرح الأسئلة، وترتكب الأخطاء، وتجمع المعلومات من كل ما تتعلمه.` },
+    q27: { title: `افعل ما تتجنبه`, text: `الحكمة هي أن تفعل ما لا تريد أن تفعله.` },
+    q28: { title: `فكّر قبل أن تسأل الذكاء الاصطناعي`, text: `أولًا، اسأل نفسك: «كيف أجعل هذه المهمة سهلة وذكية وبسيطة وجميلة؟» ثم اسأل الذكاء الاصطناعي. حاول أن تفكر أولًا.` },
+    q29: { title: `توجّه إلى الله`, text: `مشاعرك تأتي من الله، فالله وحده يستطيع أن يعينك على تجنّب تلك المشاعر وتجاوزها.` },
+    q30: { title: `المجد يتطلب التحمّل`, text: `«من يطلب المجد لا يسأل عن الراحة؛ فنيران المجد تحتاج إلى من يتحمّلها.»` },
+    q31: { title: `تحدّث ليفهمك الناس`, text: `«أقوى الناس عقلًا وأنقاهم روحًا هو من يخاطب الناس على قدر فهمهم.»` },
+    q32: { title: `ابدأ من حيث أنت`, text: `«لن يكون التوقيت مناسبًا تمامًا أبدًا. ابدأ من حيث تقف، واعمل بأي أدوات تملكها، وستجد أدوات أفضل وأنت تمضي.»` },
+    q33: { title: `دعهم يفكرون`, text: `دعهم يفكرون كما يشاؤون، لأن الناس لا يسمعون إلا ما يريدون سماعه، ولا يفكرون إلا فيما يريدون التفكير فيه.` },
+    q34: { title: `الحقيقة قد تؤلم`, text: `الحقيقة ستحرّرك، لكنها ستغضبك أولًا.` },
+    q35: { title: `ابدأ صغيرًا`, text: `«ابدأ دون ترتيب. ابدأ صغيرًا.»` },
+    q36: { title: `الاهتمام والصدق`, text: `«لا يمازحك إلا من يحبك، ولا يعاتبك إلا من يعزّك، ولا يسأل عنك إلا من يحبك حقًا.»` },
+    q37: { title: `أيام أفضل`, text: `«حين تصبح الحياة صعبة، فهذا يعني أن شيئًا أفضل قادم.»` },
+    q38: { title: `تعلّم من الآخرين`, text: `«الأحمق وحده هو من يتعلم من أخطائه. أما الحكيم فيتعلم من أخطاء الآخرين.»` },
+    q39: { title: `الأوقات الصعبة`, text: `«الأوقات الصعبة تختبرك ولا تقتلك.»` },
+    q40: { title: `النجاح والفشل`, text: `«النجاح يعانقك في الخفاء. والفشل يصفعك أمام الناس. هذه هي الحياة!»` },
+    q41: { title: `تعلّم بالممارسة`, text: `علّمني فأتذكّر. أشركني فأتعلّم.` },
+    q42: { title: `توكّل على الله`, text: `تذكّر أنه لا شيء بيدك؛ كل شيء بيد الله.` },
+    q43: { title: `ابنِ حلمك بنفسك`, text: `إذا لم تبنِ حلمك أنت، فسيوظّفك شخص آخر ليساعده في بناء حلمه.` },
+    q44: { title: `اسأل لتفهم`, text: `إذا لم تفهم، فاسأل لتفهم. لا تكن غبيًا.` },
+    q45: { title: `أحبّ ما تفعله`, text: `الطريقة الوحيدة لتقوم بعمل عظيم هي أن تحب ما تفعله.` },
+    q46: { title: `اعثر على طريقة`, text: `«إذا أردت شيئًا حقًا، فستجد طريقة. وإذا لم ترده، فستجد عذرًا.»` },
+    q47: { title: `استفد من وقت فراغك`, text: `«عندما تترك إدمانًا، فأول ما ستواجهه هو التفكير فيه في وقت فراغك. فإذا قضيت على وقت الفراغ، فقد انتصرت!»` },
+    q48: { title: `ابحث عن الحلول`, text: `ابحث عن حلول، لا عن إجابات فقط.` },
+    q49: { title: `اعرف متى تبدأ ومتى تتوقف`, text: `«يعاني البشر من مشكلتين كبيرتين: الأولى معرفة متى نبدأ، والثانية معرفة متى نتوقف.»` },
+    q50: { title: `اغتنم الفرص`, text: `«الفرص وُجدت لتُغتنم فورًا.»` },
+    q51: { title: `ابنِ حلمك بنفسك`, text: `لا تنشغل بمشاهدة غيرك من البشر يكسبون المال ويحققون أحلامهم بوقتك أنت، بينما تتجنب عملك الشاق.` },
+    q52: { title: `تحرّك`, text: `لن تنفع الاقتباسات ما لم تعمل أنت.` },
+    q53: { title: `اعمل لأجل أهدافك`, text: `لكي تحقق أهدافك، عليك أن تدرس أو تعمل في كل ساعة من اليوم لا تكون فيها تأكل، أو تصلي، أو تذهب إلى النادي الرياضي، أو تقضي وقتًا مع أصدقائك، أو تحضر الحصص الدراسية. وإذا درست أو عملت أكثر من الجميع، فيمكنك أن تنال ما تريد.` },
+    q54: { title: `عِش لنفسك`, text: `هل تعيش من أجل نفسك؟` },
+    q55: { title: `قل لنفسك ما تحتاج إلى سماعه`, text: `قل لنفسك ما تحتاج إلى سماعه.` },
+    q56: { title: `الصبر`, text: `أن تعرف ماذا تفعل في الأثناء. أي: أن تفعل أي شيء عدا الأمر الذي تتجنبه، حتى لو لم تفعل شيئًا على الإطلاق.` },
+    q57: { title: `الذكاء`, text: `سرعة تغييرك لما تفعله في الموقف نفسه.\nأي «معدّل التعلّم».` },
+    q58: { title: `التعلّم`, text: `يحدث الشيء نفسه، فتستجيب بطريقة مختلفة. «الظرف نفسه - سلوك جديد».` },
+    q59: { title: `أخلاقيات العمل`, text: `لكي تعمل بجدّ، فكّر في النتيجة بدلًا من الألم.` },
+    q60: { title: `كيف تكون منتجًا`, text: `لا تفعل شيئًا سوى المهمة التي عزمت على إنجازها.` },
+    q61: { title: `التعلّم`, text: `اربط المعرفة الجديدة بشيء مألوف أو بشيء تعرفه بالفعل.` },
+    q62: { title: `زاوية النظر`, text: `الطريقة التي تنظر بها إلى الموقف تغيّر الطريقة التي تعيشه بها. اسأل نفسك: كيف أجعل هذا الموقف رائعًا، أو أذكى، أو أسهل، أو أكثر نفعًا؟` },
+    q63: { title: `تحقيق الهدف`, text: `اسأل نفسك: ما الشيء الواحد الذي يمكنني فعله ويضمن أن أفشل في تحقيق هدفي؟ ثم اعكسه وافعل العكس لتتقدم نحو النجاح.` },
+    q64: { title: `فهم التعليمات`, text: `«افهم مستوى التفصيل في التعليمات.»` },
+    q65: { title: `الإيمان وضبط النفس`, text: `«عندما تشعر برغبة في عادة سيئة، تذكّر أن هذا الاختبار من الله. فإذا كان قد خلق هذا الشعور ليختبرني، فهو وحده القادر على أن يعينني على اجتيازه والتخلص منه.»` },
+    q66: { title: `قيمة المنتج`, text: `يجب أن يكون منتجك فريدًا، أي لا يستطيع غيرك بيعه؛ ومستمرًا، أي يواصل الناس شراءه مع مرور الوقت؛ وغالي الثمن، أي يمكنك أن تتقاضى عنه أكثر بكثير مما يكلّفك تقديمه.` },
+    q67: { title: `التطوير الشخصي`, text: `املأ دلوك بما يلي:\n\nالأول: المعرفة — ما تعرفه.\nالثاني: المهارات — ما تعرف كيف تفعله.\nالثالث: البيئة — الأشياء التي تؤثر في سلوكك، بما في ذلك من تحيط نفسك بهم وما تحيط نفسك به.` },
+    q68: { title: `اجعل نفسك منتجًا`, text: `أن «تجعل نفسك منتجًا» يعني أن تحدد ما تجيده بطبيعتك، ثم توسّعه ليصبح منتجًا يراه العالم والناس قيّمًا ومفيدًا في استخدامه.` },
+    q69: { title: `النزاهة`, text: `«ابقَ مستقيمًا، حتى لو كان الطريق الخاطئ مغريًا.»` },
+    q70: { title: `زاوية الرؤية`, text: `«إذا ضخّمت الأمور فستكبر، وإذا قلّلت من شأنها فستصغر.»` },
+    q71: { title: `الأصالة`, text: `«كلما اتسعت الفجوة بين من أنت حقًا ومن تتظاهر بأنك هو، امتلأت أكثر بالحزن والاكتئاب والشعور بالخزي.»` },
+    q72: { title: `الصبر`, text: `«اصبر، وستحصل على شيء عالي الجودة.»` },
+    q73: { title: `التعلّم`, text: `التعلّم هو أن تقسّم ما تريد تعلّمه إلى أجزاء أصغر فأصغر، حتى تصل إلى وحدة مفهومة تستطيع بها أن تغيّر سلوكك.` },
+    q74: { title: `لاحظ السلوكيات`, text: `إذا لم يستطع أحد أن يخبرك بما تقوله أو بما تفعله بجسدك، فهو لا يعطيك توجيهات واضحة لتنجح.\nلاحظ السلوكيات .` },
+    q75: { title: `لا تنسخ خطة غيرك ولا نصائحه`, text: `«حاول أن تبني خطتك بنفسك، حتى لو كانت فوضوية وغير كاملة.»\n«اختر القطع التي تناسب حياتك.»\n«ركّبها بنفسك.»` },
+    q76: { title: `افهم لماذا تشعر بهذا الشعور`, text: `الإهانة: أشعر أن صورتي عن نفسي أو إحساسي بالاحترام مهدَّد.\nالغضب: أرى أن شيئًا ما غير عادل أو خاطئ أو يتجاوز حدودي.\nالقلق: أشعر بعدم اليقين تجاه المستقبل.\nالتوتر: عليّ مطالب كثيرة، وليس لديّ ما يكفي من الوقت أو الطاقة أو المهارات أو الدعم.\nالخوف: أشعر أن شيئًا ما يهددني.\nالإفراط في التفكير: أظل أحلل ما قد يحدث ويصعب عليّ التوقف.` },
+    q77: { title: `الحياة جميلة`, text: `«الحياة جميلة، لكن بعض الناس يجعلونها بائسة.»` },
+    q78: { title: `فكّر قبل أن تقرّر`, text: `«قبل اتخاذ أي قرار، انظر في وضعك المالي ودينك وصحتك وأسرتك والحقائق والمخاطر. يجب أن يكون كل ذلك جزءًا من معادلتك.»` },
+    q79: { title: `حين تشعر بالوحدة`, text: `اخرج وتأمّل ما خلقه الله. اكتشف الحكمة وراء الأشياء، وافهم الغرض منها وفوائدها، واسأل نفسك:\n\nلماذا خلق الله هذا؟\nما الفوائد التي يقدمها؟\nكيف يعمل؟\nكيف يمكنني تحسينه؟\nفيمَ أيضًا يمكنني استخدامه؟` },
+    q80: { title: `عشر سنوات في ستة أشهر`, text: `«توقف عن الصبر، وابدأ بسؤال نفسك: كيف أنجز خطتي لعشر سنوات في ستة أشهر؟ ربما ستفشل، لكنك ستكون متقدمًا كثيرًا على من قبل ببساطة أن الأمر سيستغرق عشر سنوات.»` },
+    q81: { title: `اليوم هدية`, text: `الأمس تاريخ، والغد لغز، لكن اليوم هدية، ولهذا يُسمّى الحاضر.` },
+    q82: { title: `فريد وجاذب`, text: `«اجعل منتجك فريدًا لتحدد سعرك بنفسك، واجعله جاذبًا بما يكفي ليعود إليك العملاء دائمًا.»` }
+  };
+
+  const CATEGORIES_AR = {
+    life:       { name: `الحياة والنمو`,            blurb: `نسقط، وننهض، ونتغيّر.` },
+    discipline: { name: `الانضباط والتركيز`,        blurb: `افعل ما يهم، وتجاهل الباقي.` },
+    learning:   { name: `التعلّم والحكمة`,          blurb: `أسئلة، وأخطاء، وفهم.` },
+    creativity: { name: `الإبداع والعمل`,           blurb: `اصنع الأشياء، وابنِ ما يخصّك.` },
+    people:     { name: `الناس والعلاقات`,          blurb: `كيف نتحدث، ونصغي، ونتوقع.` },
+    time:       { name: `الوقت والأهداف`,           blurb: `أين تذهب ساعاتك، وإلى أين تقودك.` },
+    faith:      { name: `الإيمان والنظرة إلى الحياة`, blurb: `التوكّل، والخوف، والنظرة البعيدة.` }
+  };
+
+  const TAGS_AR = {
+    'identity': `الهوية`, 'originality': `التميّز`, 'resilience': `الصمود`, 'perspective': `زاوية النظر`,
+    'passion': `الشغف`, 'purpose': `الغاية`, 'sales': `المبيعات`, 'problem-solving': `حل المشكلات`,
+    'honesty': `الصدق`, 'kindness': `اللطف`, 'focus': `التركيز`, 'mastery': `الإتقان`,
+    'discipline': `الانضباط`, 'fear': `الخوف`, 'faith': `الإيمان`, 'systems': `الأنظمة`,
+    'strategy': `الاستراتيجية`, 'responsibility': `المسؤولية`, 'order': `الترتيب`, 'integrity': `النزاهة`,
+    'goals': `الأهداف`, 'composure': `الهدوء`, 'respect': `الاحترام`, 'action': `التنفيذ`,
+    'habits': `العادات`, 'failure': `الفشل`, 'curiosity': `الفضول`, 'knowledge': `المعرفة`,
+    'understanding': `الفهم`, 'priorities': `الأولويات`, 'time': `الوقت`, 'creating': `الإبداع`,
+    'making': `الصناعة`, 'expectations': `التوقعات`, 'self-awareness': `الوعي بالنفس`, 'reflection': `التأمل`,
+    'happiness': `السعادة`, 'wisdom': `الحكمة`, 'design': `التصميم`, 'phone': `الهاتف`,
+    'mornings': `الصباح`, 'change': `التغيير`, 'example': `القدوة`, 'skills': `المهارات`,
+    'independence': `الاستقلالية`, 'questions': `الأسئلة`, 'mistakes': `الأخطاء`, 'learning': `التعلّم`,
+    'ai': `الذكاء الاصطناعي`, 'thinking': `التفكير`, 'feelings': `المشاعر`, 'trust': `التوكّل`,
+    'endurance': `التحمّل`, 'glory': `المجد`, 'communication': `التواصل`, 'beginnings': `البدايات`,
+    'boundaries': `الحدود`, 'truth': `الحقيقة`, 'growth': `النمو`, 'love': `الحب`,
+    'hope': `الأمل`, 'hard-times': `الأوقات الصعبة`, 'success': `النجاح`, 'teaching': `التعليم`,
+    'practice': `الممارسة`, 'surrender': `التسليم`, 'dreams': `الأحلام`, 'work': `العمل`,
+    'excuses': `الأعذار`, 'determination': `العزيمة`, 'addiction': `الإدمان`, 'solutions': `الحلول`,
+    'restraint': `ضبط النفس`, 'opportunity': `الفرص`, 'quotes': `الاقتباسات`, 'study': `الدراسة`,
+    'hard-work': `الاجتهاد`, 'choices': `الاختيارات`, 'self-talk': `حديث النفس`,
+    'behavior': `السلوك`, 'observation': `الملاحظة`, 'loneliness': `الوحدة`, 'gratitude': `الامتنان`
+  };
+
+  root.QUOTES_AR = QUOTES_AR;
+  root.CATEGORIES_AR = CATEGORIES_AR;
+  root.TAGS_AR = TAGS_AR;
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+  <script>/*
+ * Little Wisdom — "Discover what you need".
+ *
+ * Matches the REAL quote collection to a feeling or a topic. Nothing here is a quote: it only
+ * describes what each option looks for, using the tags, categories and keywords already on every quote.
+ *   tags   : { tag: weight }    strongest signal
+ *   cats   : { category: weight }
+ *   words  : words looked for in the English title/text (whole-word start match)
+ *   pin    : quote numbers hand-checked as especially fitting (a bonus, never a replacement for matching)
+ * A new entry is picked up automatically, with no code change, in any of three ways:
+ *   1. it is assigned to an option directly (entry.topics = ['feel:lonely', 'topic:patience'])  -> always shown
+ *   2. one of its tags names the option or one of its synonyms (tag "loneliness" -> "Lonely")
+ *   3. its tags/categories match the option's weighted tags
+ * Keywords alone can never qualify an entry (one keyword is worth less than MIN_SCORE).
+ * Every entry scoring at least MIN_SCORE is shown, strongest first. Nothing is capped.
+ */
+(function (root) {
+  'use strict';
+
+  const MIN_SCORE = 3, PIN_BONUS = 5, ASSIGN_BONUS = 12, NAME_BONUS = 6;
+
+  // Synonyms: a tag equal to the option's id, its English name or one of these connects an entry to the option.
+  const SYNONYMS = {
+    unmotivated: ['motivation', 'demotivated', 'procrastination', 'consistency', 'drive'],
+    overwhelmed: ['overwhelm', 'too-much', 'burnout'],
+    confused: ['confusion', 'clarity', 'uncertainty'],
+    stressed: ['stress', 'pressure', 'anxiety'],
+    lonely: ['loneliness', 'isolation', 'disconnected', 'disconnection', 'belonging', 'social-connection', 'connection', 'self-worth', 'friendship'],
+    worried: ['worry', 'anxiety', 'fear', 'overthinking'],
+    frustrated: ['frustration', 'anger', 'setbacks'],
+    insecure: ['insecurity', 'self-doubt', 'self-worth', 'self-esteem', 'comparison', 'confidence'],
+    distracted: ['distraction', 'focus', 'attention'],
+    impatient: ['impatience', 'patience', 'waiting'],
+    tired: ['tiredness', 'exhaustion', 'rest', 'fatigue', 'burnout'],
+    happy: ['happiness', 'joy', 'contentment'],
+    confident: ['confidence', 'self-belief', 'courage'],
+    curious: ['curiosity', 'wonder'],
+    grateful: ['gratitude', 'thankfulness', 'appreciation'],
+    intelligence: ['intelligent', 'smart', 'iq'],
+    learning: ['learn', 'study', 'education'],
+    patience: ['patient', 'waiting'],
+    productivity: ['productive', 'efficiency', 'time-management'],
+    success: ['succeed', 'achievement'],
+    creativity: ['creative', 'creating', 'imagination'],
+    'work-ethic': ['hard-work', 'effort', 'diligence'],
+    'goal-achievement': ['goals', 'goal', 'goal-setting', 'achieving-goals'],
+    'personal-development': ['growth', 'self-improvement', 'self-development', 'personal-growth'],
+    business: ['sales', 'product', 'marketing', 'strategy'],
+    entrepreneurship: ['entrepreneur', 'startup', 'founder', 'building'],
+    psychology: ['mind', 'mindset', 'emotions', 'behaviour', 'behavior', 'habits'],
+    perspective: ['framing', 'mindset', 'outlook'],
+    'self-control': ['restraint', 'self-discipline', 'willpower', 'temptation'],
+    knowledge: ['wisdom', 'understanding'],
+    skills: ['skill', 'mastery', 'practice', 'craft'],
+    'decision-making': ['decisions', 'choices', 'choice', 'judgement', 'judgment'],
+    integrity: ['honesty', 'authenticity', 'character'],
+    environment: ['surroundings', 'influences', 'company']
+  };
+  const slug = function (x) { return String(x || '').toLowerCase().trim().replace(/[\s_]+/g, '-').replace(/[^a-z0-9\u0600-\u06ff-]/g, ''); };
+
+  const FEELINGS = [
+    { id: 'unmotivated', en: 'Unmotivated', ar: 'قلة الحافز', face: 'flat',
+      tags: { action: 3, discipline: 3, 'hard-work': 3, determination: 3, excuses: 3, beginnings: 2, goals: 2, endurance: 2, habits: 1 }, pin: [13, 59, 46, 35, 7, 52] },
+    { id: 'overwhelmed', en: 'Overwhelmed', ar: 'ضغط المهام', face: 'swirl',
+      tags: { priorities: 3, order: 3, beginnings: 2, focus: 2, perspective: 2, time: 1, composure: 1 }, pin: [35, 10, 17, 70, 6, 32] },
+    { id: 'confused', en: 'Confused', ar: 'ارتباك', face: 'puzzled',
+      tags: { understanding: 3, questions: 3, learning: 2, knowledge: 2, 'self-awareness': 2, reflection: 2, wisdom: 1, thinking: 1 }, pin: [44, 64, 20, 26, 15, 31, 76] },
+    { id: 'stressed', en: 'Stressed', ar: 'توتر', face: 'sweat',
+      tags: { perspective: 3, composure: 3, resilience: 2, restraint: 2, 'hard-times': 2, trust: 2, surrender: 2, faith: 1 }, pin: [70, 62, 42, 2, 39, 8, 76] },
+    { id: 'lonely', en: 'Lonely', ar: 'وحدة', face: 'tear',
+      tags: { love: 2, kindness: 2, hope: 2, 'self-talk': 3, trust: 2, feelings: 2, honesty: 1, identity: 1 }, pin: [55, 36, 37, 29, 5, 54] },
+    { id: 'worried', en: 'Worried', ar: 'قلق', face: 'worried',
+      tags: { fear: 3, trust: 3, faith: 2, surrender: 2, hope: 2, perspective: 2, feelings: 1 }, pin: [8, 42, 29, 70, 37, 76] },
+    { id: 'frustrated', en: 'Frustrated', ar: 'إحباط', face: 'angry',
+      tags: { composure: 3, endurance: 3, resilience: 2, determination: 2, failure: 2, 'hard-times': 2, restraint: 2, perspective: 1 }, pin: [72, 56, 14, 30, 46, 12, 76] },
+    { id: 'insecure', en: 'Insecure', ar: 'قلة الثقة', face: 'unsure',
+      tags: { identity: 3, originality: 3, 'self-talk': 3, 'self-awareness': 2, choices: 2, independence: 1, growth: 1 }, pin: [55, 1, 54, 71, 19, 25] },
+    { id: 'distracted', en: 'Distracted', ar: 'تشتّت', face: 'sideways',
+      tags: { focus: 3, phone: 3, discipline: 2, habits: 2, priorities: 2, mornings: 2, restraint: 2, addiction: 2 }, pin: [60, 6, 7, 23, 47, 17] },
+    { id: 'impatient', en: 'Impatient', ar: 'نفاد الصبر', face: 'eyeroll', words: ['patien'],
+      tags: { restraint: 3, endurance: 3, beginnings: 1 }, pin: [56, 72, 30, 49] },
+    { id: 'tired', en: 'Tired', ar: 'تعب', face: 'yawn',
+      tags: { endurance: 3, resilience: 2, 'hard-times': 2, hope: 2, trust: 2 }, pin: [30, 14, 37, 39, 42] },
+    { id: 'happy', en: 'Happy', ar: 'سعادة', face: 'smile',
+      tags: { happiness: 3, love: 2, passion: 2, purpose: 2, dreams: 1, success: 1 }, pin: [21, 45, 3, 36] },
+    { id: 'confident', en: 'Confident', ar: 'ثقة', face: 'smirk',
+      tags: { originality: 3, identity: 2, independence: 2, skills: 2, mastery: 2, 'self-talk': 2, action: 2 }, pin: [1, 25, 55, 22, 6, 35] },
+    { id: 'curious', en: 'Curious', ar: 'فضول', face: 'curious',
+      tags: { curiosity: 3, questions: 3, knowledge: 3, learning: 2, understanding: 1, creating: 1 }, pin: [15, 26, 44, 28, 61, 48] },
+    { id: 'grateful', en: 'Grateful', ar: 'امتنان', face: 'glow', words: ['grateful', 'thank', 'appreciat'],
+      tags: { happiness: 2, love: 2, kindness: 2, respect: 2, honesty: 1, hope: 1 }, pin: [5, 36, 21, 45] }
+  ];
+
+  const TOPICS = [
+    { id: 'discipline', en: 'Discipline', ar: 'الانضباط', cats: { discipline: 1 },
+      tags: { discipline: 3, habits: 2, restraint: 2, focus: 1, action: 1 }, pin: [7, 27, 13, 47, 6] },
+    { id: 'intelligence', en: 'Intelligence', ar: 'الذكاء', words: ['intelligen', 'smarter'],
+      tags: { learning: 2, wisdom: 2, thinking: 2, understanding: 2, change: 2, knowledge: 2, questions: 1, mistakes: 1 }, pin: [57, 58, 38, 28, 26] },
+    { id: 'learning', en: 'Learning', ar: 'التعلّم', cats: { learning: 1 },
+      tags: { learning: 3, questions: 2, mistakes: 2, practice: 2, teaching: 2, knowledge: 2, curiosity: 2, study: 1 }, pin: [57, 58, 61, 26, 41] },
+    { id: 'patience', en: 'Patience', ar: 'الصبر', words: ['patien'],
+      tags: { restraint: 3, endurance: 3 }, pin: [56, 72] },
+    { id: 'productivity', en: 'Productivity', ar: 'الإنتاجية', words: ['productive'],
+      tags: { focus: 3, action: 3, habits: 2, priorities: 2, mornings: 2, phone: 2, order: 1 }, pin: [60, 6, 7, 13, 23, 17] },
+    { id: 'success', en: 'Success', ar: 'النجاح', words: ['success'],
+      tags: { success: 3, goals: 2, determination: 2, 'hard-work': 2, opportunity: 2, glory: 2, failure: 1, dreams: 1 }, pin: [40, 59, 53, 63, 30, 50] },
+    { id: 'creativity', en: 'Creativity', ar: 'الإبداع', cats: { creativity: 1 }, words: ['creat'],
+      tags: { creating: 3, making: 3, originality: 2, design: 2, passion: 1, dreams: 1 }, pin: [18, 1, 3, 21] },
+    { id: 'work-ethic', en: 'Work ethic', ar: 'أخلاقيات العمل', words: ['work ethic', 'work hard'],
+      tags: { 'hard-work': 3, determination: 3, work: 2, discipline: 1 }, pin: [59, 53, 45, 46] },
+    { id: 'goal-achievement', en: 'Goal achievement', ar: 'تحقيق الأهداف', words: ['goal'],
+      tags: { goals: 3, determination: 2, 'hard-work': 2, action: 1 }, pin: [63, 53, 11, 46, 32] },
+    { id: 'personal-development', en: 'Personal development', ar: 'التطوير الشخصي', words: ['personal development'],
+      tags: { growth: 3, skills: 2, knowledge: 2, 'self-awareness': 2, reflection: 2, change: 2, habits: 1, identity: 1 }, pin: [67, 25, 20, 34, 24] },
+    { id: 'business', en: 'Business', ar: 'الأعمال', words: ['product', 'sell'],
+      tags: { sales: 3, systems: 2, strategy: 2, 'problem-solving': 2, solutions: 1, originality: 1, skills: 1 }, pin: [66, 4, 9, 68] },
+    { id: 'entrepreneurship', en: 'Entrepreneurship', ar: 'ريادة الأعمال', words: ['your own dream', 'sell'],
+      tags: { dreams: 3, sales: 2, originality: 2, independence: 2, making: 2, opportunity: 2, creating: 1 }, pin: [43, 51, 68, 66, 50, 25] },
+    { id: 'psychology', en: 'Psychology', ar: 'علم النفس',
+      tags: { expectations: 3, 'self-awareness': 2, reflection: 2, feelings: 2, fear: 2, habits: 2, 'self-talk': 2, boundaries: 2, composure: 1, perspective: 1 }, pin: [19, 55, 12, 33, 16, 47, 76] },
+    { id: 'perspective', en: 'Perspective', ar: 'زاوية النظر', words: ['perspective'],
+      tags: { perspective: 3, thinking: 1 }, pin: [62, 70, 2, 33] },
+    { id: 'self-control', en: 'Self-control', ar: 'ضبط النفس', words: ['self-control'],
+      tags: { restraint: 3, habits: 2, composure: 2, discipline: 2, addiction: 2 }, pin: [65, 49, 47, 12, 56, 27] },
+    { id: 'knowledge', en: 'Knowledge', ar: 'المعرفة', words: ['knowledge'],
+      tags: { knowledge: 3, learning: 1, wisdom: 2, understanding: 1, curiosity: 2 }, pin: [15, 61, 67, 21] },
+    { id: 'skills', en: 'Skills', ar: 'المهارات', words: ['skill'],
+      tags: { skills: 3, mastery: 2, practice: 2, making: 1, independence: 1 }, pin: [25, 67, 68, 6, 41] },
+    { id: 'decision-making', en: 'Decision-making', ar: 'اتخاذ القرار',
+      tags: { choices: 3, priorities: 2, thinking: 2, wisdom: 1, strategy: 1, 'problem-solving': 1, 'self-awareness': 1 }, pin: [17, 49, 69, 54, 22, 63] },
+    { id: 'integrity', en: 'Integrity', ar: 'النزاهة', words: ['integrity'],
+      tags: { integrity: 3, honesty: 3, truth: 2, respect: 1, choices: 1 }, pin: [69, 11, 36, 5, 71] },
+    { id: 'environment', en: 'Environment', ar: 'البيئة', words: ['environment', 'surround'],
+      tags: { example: 2, boundaries: 1 }, pin: [67] }
+  ];
+
+  FEELINGS.forEach(function (o) { o._kind = 'feel'; });
+  TOPICS.forEach(function (o) { o._kind = 'topic'; });
+  const kindOf = { feel: FEELINGS, topic: TOPICS };
+  function find(kind, id) { return (kindOf[kind] || []).filter(function (o) { return o.id === id; })[0] || null; }
+
+  /** Score one quote for one option. */
+  function score(option, q) {
+    let s = 0;
+    const tags = option.tags || {}, cats = option.cats || {};
+    q.tags.forEach(function (t) { if (tags[t]) s += tags[t]; });
+    q.categories.forEach(function (c) { if (cats[c]) s += cats[c]; });
+    const hay = (' ' + q.title + ' ' + q.text).toLowerCase();
+    (option.words || []).forEach(function (w) { if (hay.indexOf(' ' + w) !== -1 || hay.indexOf('"' + w) !== -1 || hay.indexOf('“' + w) !== -1) s += 2; });
+    if ((option.pin || []).indexOf(q.number) !== -1) s += PIN_BONUS;
+    // Added through the admin (or by hand): direct assignment, and tags that name the option or a synonym.
+    const key = (option._kind || '') + ':' + option.id;
+    if ((q.topics || []).indexOf(key) !== -1) s += ASSIGN_BONUS;
+    const names = [slug(option.id), slug(option.en)].concat(SYNONYMS[option.id] || []);
+    if (q.tags.some(function (t) { return names.indexOf(slug(t)) !== -1; })) s += NAME_BONUS;
+    return s;
+  }
+
+  /** Every entry that genuinely belongs to an option: strongest first, no cap, no duplicates. */
+  function recommend(quotes, option) {
+    const seen = {};
+    return quotes.map(function (q) { return { q: q, s: score(option, q) }; })
+      .filter(function (x) { if (x.s < MIN_SCORE || seen[x.q.id]) return false; seen[x.q.id] = 1; return true; })
+      .sort(function (a, b) { return b.s - a.s || a.q.number - b.q.number; })
+      .map(function (x) { return x.q; });
+  }
+
+  /** Other options whose recommendations overlap most with this one (for "explore next"). */
+  function related(quotes, kind, option, limit) {
+    const mine = {};
+    recommend(quotes, option).forEach(function (q) { mine[q.id] = 1; });
+    const out = [];
+    ['feel', 'topic'].forEach(function (k) {
+      kindOf[k].forEach(function (o) {
+        if (k === kind && o.id === option.id) return;
+        const n = recommend(quotes, o).filter(function (q) { return mine[q.id]; }).length;
+        if (n) out.push({ kind: k, option: o, n: n });
+      });
+    });
+    out.sort(function (a, b) { return b.n - a.n; });
+    return out.slice(0, limit || 4);
+  }
+
+  root.DISCOVER = { FEELINGS: FEELINGS, TOPICS: TOPICS, find: find, recommend: recommend, related: related, MIN_SCORE: MIN_SCORE, SYNONYMS: SYNONYMS, slug: slug };
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+  <script src="config.js"></script>
+  <script>/*
+ * Adds the entries you published in the private admin to the built-in collection.
+ * The built-in quotes (quotes.js) are never modified: published entries are appended after them.
+ * script.js waits for window.LW_READY, so the first paint already includes them.
+ * Any failure (no server, offline, slow) leaves the built-in collection exactly as it is.
+ */
+(function () {
+  'use strict';
+  // LW_API: null = no server (static hosting: reads entries.json beside the page); '' = same origin; 'https://…' = another origin.
+  const enabled = typeof window.LW_API === 'string';
+  const base = enabled ? window.LW_API.replace(/\/+$/, '') : '';
+  // Static hosting: entries published from the admin are committed to entries.json next to index.html.
+  const url = enabled ? base + '/api/entries' : (location.protocol === 'file:' ? null : 'entries.json');
+  const SCENES = ['window', 'rain', 'desk', 'train', 'morning', 'night', 'season'];
+  const arr = function (x) { return Array.isArray(x) ? x.filter(function (v) { return typeof v === 'string'; }) : []; };
+
+  window.LW_READY = new Promise(function (resolve) {
+    if (!url || typeof fetch !== 'function') return resolve();
+    const ctl = typeof AbortController === 'function' ? new AbortController() : null;
+    const timer = setTimeout(function () { if (ctl) ctl.abort(); resolve(); }, 3500);
+    fetch(url, { headers: { Accept: 'application/json' }, signal: ctl ? ctl.signal : undefined })
+      .then(function (r) { return r.ok && /json/.test(r.headers.get('content-type') || '') ? r.json() : null; })
+      .then(function (data) {
+        clearTimeout(timer);
+        if (!data || !Array.isArray(data.entries)) return resolve();
+        const known = {}; window.QUOTES.forEach(function (q) { known[q.id] = 1; });
+        const cats = {}; (window.CATEGORIES || []).forEach(function (c) { cats[c.id] = 1; });
+        let n = window.QUOTES.length;
+        data.entries.forEach(function (e) {
+          if (!e || typeof e.id !== 'string' || typeof e.text !== 'string' || !e.text || known[e.id]) return;
+          n += 1; known[e.id] = 1;
+          window.QUOTES.push({
+            id: e.id, number: n,
+            title: typeof e.title === 'string' && e.title ? e.title : e.text.split('\n')[0].slice(0, 60),
+            text: e.text,
+            categories: arr(e.categories).filter(function (c) { return cats[c]; }),
+            tags: arr(e.tags), topics: arr(e.topics),
+            author: typeof e.author === 'string' ? e.author : '', sourceUrl: typeof e.sourceUrl === 'string' ? e.sourceUrl : '',
+            type: typeof e.type === 'string' ? e.type : 'quote', description: typeof e.description === 'string' ? e.description : '',
+            date: typeof e.date === 'string' ? e.date : '',
+            imageUrl: typeof e.imageUrl === 'string' && /^(https?:\/\/|images\/[\w.-]+$)/.test(e.imageUrl) ? e.imageUrl : '',
+            image: SCENES[(n - 1) % SCENES.length], published: true, added: true
+          });
+        });
+        resolve();
+      })
+      .catch(function () { clearTimeout(timer); resolve(); });
+  });
+})();
+</script>
+  <script>/*
+ * Little Wisdom — original illustrations, drawn as inline SVG.
+ *
+ * ART DIRECTION: one quiet Japanese home, seen at different hours and from different rooms.
+ * Soft warm-brown ink lines (never pure black), muted washi/sage/blue/terracotta fills,
+ * a single warm light source per scene. Paper grain and the daylight tint are added in CSS
+ * (so they stay consistent and cheap); this file only draws shapes.
+ * Eight scenes: home (panorama), rain, desk, morning, window, train, night, season.
+ * No external images, so nothing can 404 and every scene scales cleanly.
+ */
+(function (root) {
+  'use strict';
+
+  const C = {
+    washi: '#f4ecda', shoji: '#f1e6cb', shojiLit: '#fbf1d4', paper: '#efe6d3',
+    line: '#5a4639', night: '#2c3646', charcoal: '#2f2722',
+    wood: '#c4a27c', woodDeep: '#8c6a4a', tatami: '#c9c295', tatamiEdge: '#6b6f4f',
+    sage: '#9fb097', sageDeep: '#5f7659', blue: '#8ea6bd', blueDeep: '#4d6178',
+    pink: '#e3b7ae', terracotta: '#b9705a', maple: '#c0583f', amber: '#d89a58',
+    glow: '#f2cf94', stone: '#b9b4a8', cream: '#fbf6ea'
+  };
+  const L = C.line;
+
+  /* ---------- small drawing helpers (all return SVG markup strings) ---------- */
+  const rainLines = (x0, y0, x1, y1, n, cls) => {
+    let d = '';
+    for (let i = 0; i < n; i++) {
+      const x = x0 + ((i * 53) % (x1 - x0));
+      const y = y0 + ((i * 37) % (y1 - y0 - 24));
+      d += `M${x} ${y}l-5 18`;
+    }
+    return `<path class="${cls || 'rain'}" d="${d}" stroke="#e6edf2" stroke-width="1.6" stroke-linecap="round" opacity=".6"/>`;
+  };
+  const lattice = (x, y, w, h, cols, rows, sw, op) => {
+    let d = '';
+    for (let i = 1; i < cols; i++) d += `M${x + (w * i) / cols} ${y}v${h}`;
+    for (let j = 1; j < rows; j++) d += `M${x} ${y + (h * j) / rows}h${w}`;
+    return `<path d="${d}" fill="none" stroke="${L}" stroke-width="${sw || 2}" opacity="${op || 0.7}"/>`;
+  };
+  const shoji = (x, y, w, h, cols, rows, lit) =>
+    `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${lit ? C.shojiLit : C.shoji}" stroke="${L}" stroke-width="3"/>` + lattice(x, y, w, h, cols, rows);
+  const tatami = (x, y, w, h) => {
+    let d = '';
+    for (let yy = y + h * 0.34; yy < y + h; yy += h * 0.34) d += `M${x} ${yy}h${w}`;
+    for (let xx = x + w * 0.27; xx < x + w; xx += w * 0.46) d += `M${xx} ${y}v${h * 0.34}`;
+    for (let xx = x + w * 0.5; xx < x + w; xx += w * 0.46) d += `M${xx} ${y + h * 0.34}v${h * 0.33}`;
+    return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${C.tatami}"/>` +
+      `<path d="${d}" stroke="${C.tatamiEdge}" stroke-width="2.5" opacity=".55"/>` +
+      `<path d="M${x} ${y}h${w}" stroke="${L}" stroke-width="3"/>`;
+  };
+  const planks = (x, y, w, h) => {
+    let d = '';
+    for (let yy = y + h / 3; yy < y + h - 1; yy += h / 3) d += `M${x} ${yy}h${w}`;
+    return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${C.wood}" stroke="${L}" stroke-width="3"/>` +
+      `<path d="${d}" stroke="${L}" stroke-width="1.6" opacity=".5"/>`;
+  };
+  const steam = (x, y) =>
+    `<path class="steam" d="M${x} ${y}c-7-9 7-14 0-24M${x + 12} ${y + 2}c-7-9 7-14 0-24" fill="none" stroke="${C.cream}" stroke-width="3" stroke-linecap="round" opacity=".75"/>`;
+  const cup = (x, y) =>
+    `<ellipse cx="${x + 17}" cy="${y + 31}" rx="26" ry="5" fill="${L}" opacity=".18"/>` +
+    `<path d="M${x} ${y}h34l-4 30h-26z" fill="${C.cream}" stroke="${L}" stroke-width="3" stroke-linejoin="round"/>` +
+    `<ellipse cx="${x + 17}" cy="${y + 1}" rx="17" ry="4" fill="${C.sageDeep}" stroke="${L}" stroke-width="2.5"/>` + steam(x + 10, y - 6);
+  const lanternStone = (x, y) => // y = ground line
+    `<rect x="${x - 17}" y="${y - 20}" width="34" height="20" fill="${C.stone}" stroke="${L}" stroke-width="3"/>` +
+    `<rect x="${x - 6}" y="${y - 62}" width="12" height="44" fill="${C.stone}" stroke="${L}" stroke-width="3"/>` +
+    `<rect x="${x - 19}" y="${y - 98}" width="38" height="38" fill="${C.stone}" stroke="${L}" stroke-width="3"/>` +
+    `<rect x="${x - 8}" y="${y - 90}" width="16" height="22" fill="${C.glow}" stroke="${L}" stroke-width="2.5"/>` +
+    `<path d="M${x - 32} ${y - 98}L${x} ${y - 124}L${x + 32} ${y - 98}z" fill="${C.stone}" stroke="${L}" stroke-width="3" stroke-linejoin="round"/>`;
+  const mapleTree = (x, y) => // y = ground; trunk then clustered foliage
+    `<path d="M${x} ${y}q8-60-4-118" fill="none" stroke="${C.woodDeep}" stroke-width="9" stroke-linecap="round"/>` +
+    `<g stroke="${L}" stroke-width="2.5"><circle cx="${x - 4}" cy="${y - 136}" r="42" fill="${C.maple}"/><circle cx="${x + 34}" cy="${y - 118}" r="28" fill="${C.amber}"/><circle cx="${x - 40}" cy="${y - 112}" r="26" fill="${C.terracotta}"/><circle cx="${x + 8}" cy="${y - 168}" r="24" fill="${C.amber}"/></g>`;
+  /** The shared rain-garden vignette, drawn in a 380 x 260 box. */
+  const garden = (id) =>
+    `<defs><linearGradient id="${id}sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9fb0bd"/><stop offset="1" stop-color="#d3dbd8"/></linearGradient></defs>` +
+    `<rect width="380" height="260" fill="url(#${id}sky)"/>` +
+    `<path d="M0 150q50-34 100-12t100-8 100 8 80-6V260H0z" fill="#8aa08a" opacity=".85"/>` +
+    `<path d="M0 190q70-24 150-8t140-6 90 4V260H0z" fill="${C.sageDeep}"/>` +
+    mapleTree(70, 252) + lanternStone(268, 252) +
+    `<ellipse cx="168" cy="250" rx="30" ry="6" fill="${C.stone}" stroke="${L}" stroke-width="2.5"/><ellipse cx="206" cy="256" rx="20" ry="4" fill="${C.stone}" stroke="${L}" stroke-width="2.5"/>` +
+    rainLines(0, 0, 380, 260, 30);
+
+  const glowDef = (id, color, op) =>
+    `<radialGradient id="${id}"><stop offset="0" stop-color="${color}" stop-opacity="${op || 0.85}"/><stop offset="1" stop-color="${color}" stop-opacity="0"/></radialGradient>`;
+
+  /* ---------- the scenes ---------- */
+  const SCENES = {
+    /** Panorama used by the hero: the whole room at once. */
+    home: {
+      viewBox: '0 0 1200 520',
+      alt: 'A quiet Japanese room on a rainy afternoon: open shoji onto a garden, a low desk with tea and a book, a paper lantern, and a hanging scroll with a brush-drawn circle.',
+      altAr: 'غرفة يابانية هادئة في عصر ماطر: أبواب شوجي مفتوحة على حديقة، ومكتب منخفض عليه شاي وكتاب، وفانوس ورقي، ولوحة معلّقة فيها دائرة بخط الفرشاة.',
+      svg: (id) => `
+        <defs>${glowDef(id + 'l', C.glow, 0.9)}${glowDef(id + 'w', '#fff3cf', 0.55)}</defs>
+        <rect width="1200" height="520" fill="${C.washi}"/>
+        <rect width="1200" height="44" fill="${C.woodDeep}" stroke="${L}" stroke-width="3"/>
+        <g transform="translate(70 70) scale(1.37 1.12)"><svg width="380" height="260" viewBox="0 0 380 260" overflow="hidden">${garden(id)}</svg></g>
+        <rect x="70" y="70" width="520" height="291" fill="none" stroke="${L}" stroke-width="5"/>
+        ${shoji(0, 44, 70, 316, 2, 8, true)}${shoji(590, 44, 60, 316, 2, 8, true)}
+        ${planks(0, 360, 700, 34)}
+        <circle cx="260" cy="395" r="120" fill="url(#${id}w)"/>
+        ${tatami(0, 394, 1200, 126)}
+        <circle cx="800" cy="250" r="260" fill="url(#${id}l)"/>
+        <rect x="690" y="300" width="300" height="22" fill="${C.wood}" stroke="${L}" stroke-width="3"/>
+        <rect x="716" y="322" width="16" height="70" fill="${C.woodDeep}" stroke="${L}" stroke-width="3"/><rect x="948" y="322" width="16" height="70" fill="${C.woodDeep}" stroke="${L}" stroke-width="3"/>
+        <path d="M730 300q50-24 100 0q50-24 100 0v-8q-50-22-100 0q-50-22-100 0z" fill="${C.cream}" stroke="${L}" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M748 290q34-12 68 0M844 290q34-12 68 0" fill="none" stroke="${L}" stroke-width="1.6" opacity=".5"/>
+        <ellipse cx="900" cy="282" rx="22" ry="17" fill="${C.sage}" stroke="${L}" stroke-width="3"/><path d="M920 276q16 4 4 18" fill="none" stroke="${L}" stroke-width="3"/>
+        ${cup(826, 262)}
+        <rect x="1000" y="214" width="62" height="110" rx="10" fill="${C.shojiLit}" stroke="${L}" stroke-width="3"/>
+        <path d="M1031 214v110M1000 251h62M1000 288h62" stroke="${L}" stroke-width="1.8" opacity=".55"/>
+        <rect x="1014" y="324" width="34" height="68" fill="${C.woodDeep}" stroke="${L}" stroke-width="3"/>
+        <rect x="1110" y="70" width="90" height="324" fill="${C.shoji}" stroke="${L}" stroke-width="3"/>
+        <rect x="1122" y="96" width="66" height="232" fill="${C.cream}" stroke="${L}" stroke-width="2.5"/>
+        <circle cx="1155" cy="180" r="24" fill="none" stroke="${L}" stroke-width="7" stroke-dasharray="130 28" stroke-linecap="round" transform="rotate(-70 1155 180)"/>
+        <rect x="1118" y="326" width="74" height="12" fill="${C.woodDeep}" stroke="${L}" stroke-width="3"/>
+        <path d="M1155 326v-30M1143 296q12-16 24 0z" fill="${C.cream}" stroke="${L}" stroke-width="2.5"/>
+        <path d="M1155 296q-8-24 4-40M1155 300q12-18 20-30" fill="none" stroke="${C.woodDeep}" stroke-width="3" stroke-linecap="round"/>`
+    },
+
+    rain: {
+      alt: 'Rain falling on a Japanese garden seen through open shoji screens: a maple tree, a stone lantern, and a cup of tea on the wooden veranda.',
+      altAr: 'مطر يتساقط على حديقة يابانية يُرى من خلف أبواب شوجي مفتوحة: شجرة قيقب وفانوس حجري وكوب شاي على الشرفة الخشبية.',
+      svg: (id) => `
+        <defs>${glowDef(id + 'w', '#fff3cf', 0.5)}</defs>
+        <rect width="600" height="400" fill="${C.washi}"/>
+        <g transform="translate(110 40)"><svg width="380" height="260" viewBox="0 0 380 260" overflow="hidden">${garden(id)}</svg></g>
+        <rect x="110" y="40" width="380" height="260" fill="none" stroke="${L}" stroke-width="5"/>
+        ${shoji(0, 28, 110, 272, 2, 7, true)}${shoji(490, 28, 110, 272, 2, 7, true)}
+        <rect width="600" height="28" fill="${C.woodDeep}" stroke="${L}" stroke-width="3"/>
+        ${planks(0, 300, 600, 100)}
+        <circle cx="300" cy="330" r="150" fill="url(#${id}w)"/>
+        ${cup(420, 322)}`
+    },
+
+    desk: {
+      alt: 'A low wooden desk in a lamp-lit room: an open book, a teapot and a cup of tea, with a shoji wall behind.',
+      altAr: 'مكتب خشبي منخفض في غرفة مضاءة بمصباح ورقي: كتاب مفتوح وإبريق شاي وكوب، وجدار شوجي في الخلف.',
+      svg: (id) => `
+        <defs>${glowDef(id + 'l', C.glow, 0.9)}</defs>
+        <rect width="600" height="400" fill="${C.shoji}"/>
+        ${lattice(0, 0, 600, 262, 8, 4, 2.5, 0.4)}
+        <rect width="600" height="262" fill="none" stroke="${L}" stroke-width="3"/>
+        <circle cx="500" cy="210" r="250" fill="url(#${id}l)"/>
+        ${tatami(0, 262, 600, 138)}
+        <rect x="50" y="236" width="410" height="22" fill="${C.wood}" stroke="${L}" stroke-width="3"/>
+        <rect x="76" y="258" width="16" height="64" fill="${C.woodDeep}" stroke="${L}" stroke-width="3"/><rect x="418" y="258" width="16" height="64" fill="${C.woodDeep}" stroke="${L}" stroke-width="3"/>
+        <path d="M96 236q50-22 100 0q50-22 100 0v-8q-50-22-100 0q-50-22-100 0z" fill="${C.cream}" stroke="${L}" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M112 226q38-14 76 0M212 226q38-14 76 0" fill="none" stroke="${L}" stroke-width="1.6" opacity=".5"/>
+        <ellipse cx="350" cy="220" rx="26" ry="19" fill="${C.sage}" stroke="${L}" stroke-width="3"/><path d="M372 214q18 4 4 20" fill="none" stroke="${L}" stroke-width="3"/>
+        ${cup(396, 205)}
+        <rect x="488" y="150" width="70" height="124" rx="12" fill="${C.shojiLit}" stroke="${L}" stroke-width="3"/>
+        <path d="M523 150v124M488 191h70M488 232h70" stroke="${L}" stroke-width="1.8" opacity=".55"/>
+        <rect x="506" y="274" width="34" height="14" fill="${C.woodDeep}" stroke="${L}" stroke-width="3"/>`
+    },
+
+    morning: {
+      alt: 'Morning sun through a shoji window casting a lattice of light onto the tatami floor, beside a low bookshelf and a small bonsai.',
+      altAr: 'شمس الصباح تدخل من نافذة شوجي وترسم شبكة ضوء على أرضية التاتامي، بجانب رفّ كتب منخفض وشجرة بونساي صغيرة.',
+      svg: (id) => `
+        <defs><linearGradient id="${id}b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${C.glow}" stop-opacity=".8"/><stop offset="1" stop-color="${C.glow}" stop-opacity=".25"/></linearGradient></defs>
+        <rect width="600" height="400" fill="${C.washi}"/>
+        ${shoji(40, 40, 260, 250, 4, 5, true)}
+        ${tatami(0, 290, 600, 110)}
+        <path d="M44 290h252l118 110H130z" fill="url(#${id}b)"/>
+        <path d="M105 290L180 400M170 290L245 400M235 290L310 400M75 322h280M105 352h280M60 382h300" stroke="${C.woodDeep}" stroke-width="3" opacity=".28"/>
+        <rect x="334" y="64" width="46" height="150" fill="${C.cream}" stroke="${L}" stroke-width="3"/>
+        <path d="M357 92q-9 36 3 82" fill="none" stroke="${L}" stroke-width="6" stroke-linecap="round"/>
+        <rect x="420" y="150" width="150" height="140" fill="${C.wood}" stroke="${L}" stroke-width="3"/>
+        <path d="M420 220h150" stroke="${L}" stroke-width="3"/>
+        <g stroke="${L}" stroke-width="2.5"><rect x="430" y="178" width="16" height="42" fill="${C.sage}"/><rect x="448" y="170" width="14" height="50" fill="${C.pink}"/><rect x="464" y="182" width="18" height="38" fill="${C.blue}"/><rect x="484" y="174" width="14" height="46" fill="${C.cream}"/><rect x="434" y="246" width="26" height="44" fill="${C.blue}"/><rect x="462" y="240" width="18" height="50" fill="${C.sage}"/><rect x="484" y="252" width="20" height="38" fill="${C.terracotta}"/></g>
+        <path d="M500 150v-14h38v14z" fill="${C.woodDeep}" stroke="${L}" stroke-width="3"/>
+        <path d="M519 136q-6-22 6-34M519 136q16-18 26-18M519 136q-18-10-30-6" fill="none" stroke="${C.sageDeep}" stroke-width="6" stroke-linecap="round"/>
+        <circle cx="508" cy="100" r="16" fill="${C.sageDeep}" stroke="${L}" stroke-width="2.5"/><circle cx="534" cy="112" r="14" fill="${C.sage}" stroke="${L}" stroke-width="2.5"/>`
+    },
+
+    window: {
+      alt: 'Someone sitting on a wooden veranda at dusk, back turned, looking out at a quiet garden and a pale moon.',
+      altAr: 'شخص جالس على شرفة خشبية وقت الغروب، ظهره للمشاهد، يتأمل حديقة هادئة وقمرًا شاحبًا.',
+      svg: (id) => `
+        <defs><linearGradient id="${id}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${C.blueDeep}"/><stop offset=".7" stop-color="#c9a99d"/><stop offset="1" stop-color="#e4cfa8"/></linearGradient>${glowDef(id + 'l', C.glow, 0.8)}</defs>
+        <rect width="600" height="400" fill="url(#${id}s)"/>
+        <circle cx="430" cy="110" r="34" fill="#f6ecd2"/>
+        <path d="M0 250q90-50 190-18t170-10 240 14V320H0z" fill="#5d7185" opacity=".75"/>
+        <path d="M0 290q120-34 250-8t200 0 150 10V320H0z" fill="${C.sageDeep}"/>
+        <g stroke="${C.sageDeep}" stroke-width="7" stroke-linecap="round"><path d="M520 320V150M548 320V120M492 320V170" /></g>
+        <path d="M514 190h12M542 160h12M486 210h12M514 250h12M542 220h12" stroke="${L}" stroke-width="3"/>
+        <path d="M460 140q-30 8-50-4M470 200q-40 6-62-8" fill="none" stroke="${C.sage}" stroke-width="5" stroke-linecap="round"/>
+        <g transform="translate(300 0)"><circle cx="0" cy="298" r="70" fill="url(#${id}l)"/>${lanternStone(0, 316).replace(/stroke-width="3"/g, 'stroke-width="2.5"')}</g>
+        ${planks(0, 318, 600, 82)}
+        ${shoji(0, 0, 80, 318, 2, 8, false)}
+        <path d="M110 400v-80q0-52 52-52t52 52v80z" fill="${C.sage}" stroke="${L}" stroke-width="3" stroke-linejoin="round"/>
+        <circle cx="162" cy="226" r="30" fill="#f1d3bc" stroke="${L}" stroke-width="3"/>
+        <path d="M130 224q2-34 32-32 28 2 32 32-18-14-36-8-16 4-28 8z" fill="${C.charcoal}"/>
+        <circle cx="162" cy="190" r="12" fill="${C.charcoal}"/>
+        ${cup(246, 320).replace(/<path class="steam"[^>]*\/>/, '')}`
+    },
+
+    train: {
+      alt: 'A sunset over fields and a distant mountain seen from a train window, with hanging hand straps and a passenger in silhouette.',
+      altAr: 'غروب الشمس فوق حقول وجبل بعيد من نافذة قطار، مع حلقات إمساك معلّقة وظلّ راكب.',
+      svg: (id) => `
+        <defs><linearGradient id="${id}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${C.blue}"/><stop offset=".55" stop-color="${C.pink}"/><stop offset="1" stop-color="${C.glow}"/></linearGradient></defs>
+        <rect width="600" height="400" fill="#3b302a"/>
+        <rect x="70" y="78" width="460" height="214" rx="16" fill="url(#${id}s)"/>
+        <circle cx="400" cy="224" r="36" fill="#f9e1ae"/>
+        <path d="M240 292L350 156L460 292z" fill="${C.blueDeep}" opacity=".85"/><path d="M326 186L350 156L374 186L362 181L350 192L338 181z" fill="#f4ede0"/>
+        <path d="M70 268c80-30 150-6 230 0s160-28 230-6V292H70z" fill="${C.sage}"/>
+        <path d="M70 284c120-14 260 8 460-6V292H70z" fill="#c4b57d"/>
+        <path d="M70 118q115 36 230 0t230 0M70 138q115 36 230 0t230 0" fill="none" stroke="#3b302a" stroke-width="1.8" opacity=".7"/>
+        <path d="M300 104v190" stroke="#3b302a" stroke-width="5"/>
+        <rect x="70" y="78" width="460" height="214" rx="16" fill="none" stroke="#241c18" stroke-width="10"/><path d="M300 78v214" stroke="#241c18" stroke-width="9"/>
+        <path d="M40 42h520" stroke="#bdb6a8" stroke-width="6" stroke-linecap="round"/>
+        <g fill="none" stroke="#d9d1c0" stroke-width="4"><path d="M130 42v56M250 42v56M390 42v56M500 42v56"/><circle cx="130" cy="112" r="14"/><circle cx="250" cy="112" r="14"/><circle cx="390" cy="112" r="14"/><circle cx="500" cy="112" r="14"/></g>
+        <rect y="318" width="600" height="82" fill="#46564f"/><path d="M0 318h600" stroke="#241c18" stroke-width="4"/><path d="M0 346h600" stroke="#2f3b36" stroke-width="3" stroke-dasharray="14 10"/>
+        <path d="M96 400v-52q0-36 54-36t54 36v52z" fill="#1c1512"/><circle cx="150" cy="286" r="26" fill="#1c1512"/>`
+    },
+
+    night: {
+      alt: 'A quiet lane at night in light rain: paper lanterns, a softly glowing vending machine, utility wires, and a person walking under an umbrella.',
+      altAr: 'زقاق هادئ في الليل تحت مطر خفيف: فوانيس ورقية وآلة بيع مضيئة وأسلاك كهرباء، وشخص يمشي بمظلّة.',
+      svg: (id) => `
+        <defs>${glowDef(id + 'l', C.glow, 0.7)}${glowDef(id + 'v', '#cfe6f4', 0.75)}${glowDef(id + 'r', '#e0866a', 0.7)}</defs>
+        <rect width="600" height="400" fill="${C.night}"/>
+        <path d="M470 56a32 32 0 1 0 32 40 26 26 0 1 1-32-40z" fill="#f5ead0"/>
+        <path d="M0 270V170l60-34 60 34v-28l60-30 60 30v128zM360 270V150h70V120l44-26 44 26v150z" fill="#3b4859" stroke="#222b38" stroke-width="3"/>
+        <g fill="${C.glow}" opacity=".9"><rect x="22" y="188" width="20" height="26"/><rect x="132" y="170" width="20" height="26"/><rect x="190" y="200" width="20" height="26"/><rect x="410" y="170" width="18" height="24"/></g>
+        <path d="M0 96q150 36 300 0t300 0M0 116q150 36 300 0t300 0" fill="none" stroke="#10151c" stroke-width="1.8"/>
+        <path d="M296 70v230M268 96h56M274 118h44" stroke="#10151c" stroke-width="6"/>
+        <circle cx="100" cy="226" r="62" fill="url(#${id}r)"/><circle cx="214" cy="236" r="56" fill="url(#${id}r)"/>
+        <g stroke="#1a1410" stroke-width="2.5"><path d="M100 196v10M214 208v10" /><ellipse cx="100" cy="226" rx="17" ry="22" fill="${C.terracotta}"/><ellipse cx="214" cy="236" rx="15" ry="20" fill="${C.terracotta}"/></g>
+        <path d="M86 220h28M86 232h28M200 230h28M200 242h28" stroke="#1a1410" stroke-width="1.6" opacity=".6"/>
+        <circle cx="500" cy="236" r="90" fill="url(#${id}v)"/>
+        <rect x="466" y="170" width="70" height="130" rx="6" fill="#dbe6ec" stroke="#222b38" stroke-width="3"/>
+        <rect x="474" y="180" width="54" height="64" fill="#f8fcff"/><g><circle cx="486" cy="196" r="5" fill="${C.terracotta}"/><circle cx="502" cy="196" r="5" fill="${C.sage}"/><circle cx="518" cy="196" r="5" fill="${C.blue}"/><circle cx="486" cy="216" r="5" fill="${C.amber}"/><circle cx="502" cy="216" r="5" fill="${C.pink}"/><circle cx="518" cy="216" r="5" fill="${C.sage}"/></g>
+        <rect x="480" y="256" width="40" height="28" fill="#2b3946"/>
+        <rect y="300" width="600" height="100" fill="#1f2833"/>
+        <path d="M100 310v70M214 316v66M500 310v80" stroke="${C.glow}" stroke-width="10" opacity=".14"/><path d="M0 346h600" stroke="${C.blueDeep}" stroke-width="3" stroke-dasharray="40 30"/>
+        <path d="M360 318l-5-48M372 318l-3-48" stroke="#10151c" stroke-width="9" stroke-linecap="round"/><rect x="348" y="214" width="34" height="58" rx="12" fill="#10151c"/><circle cx="365" cy="202" r="12" fill="#10151c"/>
+        <path d="M318 206q47-52 94 0z" fill="${C.pink}" stroke="#10151c" stroke-width="3"/>
+        ${rainLines(0, 0, 600, 300, 34)}`
+    },
+
+    season: {
+      alt: 'Red maple leaves on a branch, a few drifting down in soft autumn light.',
+      altAr: 'أوراق قيقب حمراء على غصن، وبعضها يتساقط ببطء في ضوء خريفي ناعم.',
+      svg: (id) => `
+        <defs><linearGradient id="${id}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8e0e2"/><stop offset="1" stop-color="${C.cream}"/></linearGradient>
+        <path id="${id}m" d="M0-19L4-11L10-15L8-6L17-8L12 0L16 6L7 6L6 14L0 10L0 20L0 10L-6 14L-7 6L-16 6L-12 0L-17-8L-8-6L-10-15L-4-11z" stroke="${L}" stroke-width="2" stroke-linejoin="round"/></defs>
+        <rect width="600" height="400" fill="url(#${id}s)"/>
+        <path d="M-10 70C110 100 200 60 330 120S500 150 620 100" fill="none" stroke="${C.woodDeep}" stroke-width="10" stroke-linecap="round"/>
+        <path d="M210 92c20 34 14 66 40 96M410 132c-10 30 4 54-6 92" fill="none" stroke="${C.woodDeep}" stroke-width="5" stroke-linecap="round"/>
+        <g>
+          <use href="#${id}m" transform="translate(120 98) scale(1.5)" fill="${C.maple}"/><use href="#${id}m" transform="translate(180 84) scale(1.2) rotate(20)" fill="${C.amber}"/>
+          <use href="#${id}m" transform="translate(262 120) scale(1.6) rotate(-15)" fill="${C.terracotta}"/><use href="#${id}m" transform="translate(340 134) scale(1.3) rotate(10)" fill="${C.maple}"/>
+          <use href="#${id}m" transform="translate(452 150) scale(1.6) rotate(-8)" fill="${C.amber}"/><use href="#${id}m" transform="translate(530 124) scale(1.3) rotate(25)" fill="${C.terracotta}"/>
+          <use href="#${id}m" transform="translate(252 200) scale(1.3) rotate(30)" fill="${C.maple}"/><use href="#${id}m" transform="translate(402 240) scale(1.4) rotate(-20)" fill="${C.amber}"/>
+          <use href="#${id}m" transform="translate(150 262) scale(.9) rotate(50)" fill="${C.terracotta}" opacity=".9"/><use href="#${id}m" transform="translate(330 300) scale(.9) rotate(-40)" fill="${C.maple}" opacity=".9"/>
+          <use href="#${id}m" transform="translate(480 310) scale(.8) rotate(15)" fill="${C.amber}" opacity=".9"/>
+        </g>
+        <path d="M0 356c120-26 220 8 340-8s190-22 260 4v52H0z" fill="${C.sage}"/><path d="M0 378c140-16 260 6 380-4s160-8 220 0v26H0z" fill="${C.sageDeep}"/>
+        <ellipse cx="190" cy="372" rx="34" ry="8" fill="${C.stone}" stroke="${L}" stroke-width="2.5"/><ellipse cx="262" cy="386" rx="24" ry="6" fill="${C.stone}" stroke="${L}" stroke-width="2.5"/>`
+    }
+  };
+
+  let counter = 0;
+
+  /**
+   * Returns a div holding the scene as an SVG.
+   * Decorative scenes are hidden from assistive tech; meaningful ones get alt text.
+   * options.live adds the gentle rain/steam motion (used on a few large images only).
+   */
+  function sceneElement(name, options) {
+    const opts = options || {};
+    const scene = SCENES[name] || SCENES.window;
+    const id = 'sc' + (++counter) + '-';
+    const wrap = document.createElement('div');
+    wrap.className = 'art' + (opts.live ? ' art--live' : '') + (opts.className ? ' ' + opts.className : '');
+    const alt = (document.documentElement.lang === 'ar' && scene.altAr) || scene.alt;
+    const label = opts.decorative ? 'aria-hidden="true"' : `role="img" aria-label="${alt.replace(/"/g, '&quot;')}"`;
+    // Content is static, authored in this file; it never contains user text.
+    wrap.innerHTML = `<svg viewBox="${scene.viewBox || '0 0 600 400'}" preserveAspectRatio="xMidYMid slice" ${label} focusable="false">${scene.svg(id)}</svg>`;
+    return wrap;
+  }
+
+  root.SCENES = SCENES;
+  root.sceneElement = sceneElement;
+})(window);
+</script>
+  <script>/*
+ * Little Wisdom — application logic.
+ * Hash-routed single page:
+ *   #/                      home
+ *   #/library?cat=&tag=&q=  search + filters (state lives in the URL)
+ *   #/quote/q07?cat=life    one quote; the optional query is the browsing context
+ *   #/bookmarks
+ * Every view renders from the same QUOTES records (English) merged with QUOTES_AR (Arabic).
+ * All text is inserted with createTextNode; innerHTML is used only for our own static SVG.
+ * The language (en/ar) lives in I18N; switching re-renders the current view in place.
+ */
+(window.LW_READY || Promise.resolve()).then(function () {
+  'use strict';
+
+  const app = document.getElementById('app');
+  const main = document.getElementById('main');
+  const I18N = window.I18N;
+
+  /* ---------- Fail visibly if the data did not load ---------- */
+  if (!I18N || !Array.isArray(window.QUOTES) || !window.QUOTES.length || !window.sceneElement) {
+    app.textContent = 'Sorry, the quotes could not be loaded. Please refresh the page. · للأسف ما قدرنا نحمّل الاقتباسات. حدّث الصفحة.';
+    app.style.cssText = 'padding:4rem 1.25rem;text-align:center';
+    return;
+  }
+  const t = I18N.t;
+
+  const QUOTES = window.QUOTES.filter(function (q) { return q.published; });
+  const CATEGORIES = window.CATEGORIES;
+  const AR = window.QUOTES_AR || {};
+  const CATEGORIES_AR = window.CATEGORIES_AR || {};
+  const TAGS_AR = window.TAGS_AR || {};
+  const byId = new Map(QUOTES.map(function (q) { return [q.id, q]; }));
+  const pad = function (n) { return String(n).padStart(2, '0'); };
+  const isAr = function () { return I18N.lang === 'ar'; };
+
+  /* ---------- Localised views of the data (English stays the source of truth) ---------- */
+  /** Title/text to display. Falls back to English (flagged with its own lang) if a translation is missing. */
+  function qv(q) {
+    const a = isAr() ? AR[q.id] : null;
+    return a && a.text ? { title: a.title || q.title, text: a.text, lang: 'ar' } : { title: q.title, text: q.text, lang: 'en' };
+  }
+  /** lang/dir attributes, only when a piece of content differs from the page language. */
+  function langAttrs(v) {
+    return v.lang === I18N.lang ? {} : { lang: v.lang, dir: v.lang === 'ar' ? 'rtl' : 'ltr' };
+  }
+  function catName(id) {
+    const c = CATEGORIES.find(function (k) { return k.id === id; });
+    return isAr() && CATEGORIES_AR[id] ? CATEGORIES_AR[id].name : (c ? c.name : id);
+  }
+  function catBlurb(id) {
+    const c = CATEGORIES.find(function (k) { return k.id === id; });
+    return isAr() && CATEGORIES_AR[id] ? CATEGORIES_AR[id].blurb : (c ? c.blurb : '');
+  }
+  function tagName(tag) { return isAr() && TAGS_AR[tag] ? TAGS_AR[tag] : tag; }
+  function sortedTags() {
+    return allTags.slice().sort(function (a, b) { return tagName(a).localeCompare(tagName(b), I18N.lang); });
+  }
+
+  /* ---------- Tiny DOM helper ---------- */
+  function h(tag, attrs) {
+    const el = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (k) {
+      const v = attrs[k];
+      if (v === null || v === undefined || v === false) return;
+      if (k === 'class') el.className = v;
+      else if (k.slice(0, 2) === 'on') el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v === true ? '' : v);
+    });
+    Array.prototype.slice.call(arguments, 2).flat(Infinity).forEach(function (kid) {
+      if (kid === null || kid === undefined || kid === false) return;
+      el.append(kid.nodeType ? kid : document.createTextNode(kid));
+    });
+    return el;
+  }
+
+  // data-flip marks directional arrows that CSS mirrors in right-to-left layouts.
+  const ICONS = {
+    bookmark: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-6-4.500L6 21z"/></svg>',
+    copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>',
+    share: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.600 13.500 6.800 4M15.400 6.500l-6.800 4"/></svg>',
+    search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.500-3.500"/></svg>',
+    next: '<svg data-flip viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+    prev: '<svg data-flip viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>',
+    shuffle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>'
+  };
+  function icon(name) { const s = document.createElement('span'); s.style.display = 'contents'; s.innerHTML = ICONS[name]; return s; }
+
+  /** Only http(s) links are allowed as sources; anything else (e.g. javascript:) is dropped. */
+  function safeUrl(value) {
+    try {
+      const u = new URL(value);
+      return (u.protocol === 'https:' || u.protocol === 'http:') ? u.href : '';
+    } catch (e) { return ''; }
+  }
+
+  /* ---------- Bookmarks: in-memory list, written through to localStorage ---------- */
+  const STORE_KEY = 'littlewisdom.bookmarks.v1';
+  const bookmarks = (function () {
+    let ids = [];
+    function load() {
+      try {
+        const arr = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+        ids = Array.isArray(arr) ? arr.filter(function (id) { return byId.has(id); }) : [];
+      } catch (e) { /* storage unavailable or corrupt: keep what we have in memory */ }
+    }
+    load();
+    return {
+      reload: load,
+      list: function () { return ids.slice(); },
+      has: function (id) { return ids.indexOf(id) !== -1; },
+      toggle: function (id) {
+        const i = ids.indexOf(id);
+        if (i === -1) ids.push(id); else ids.splice(i, 1);
+        let persisted = true;
+        try { localStorage.setItem(STORE_KEY, JSON.stringify(ids)); } catch (e) { persisted = false; }
+        return { saved: i === -1, persisted: persisted };
+      }
+    };
+  })();
+
+  /* ---------- Feedback ---------- */
+  let toastTimer;
+  function toast(message) {
+    const el = document.getElementById('toast');
+    el.textContent = message;
+    el.classList.add('is-visible');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove('is-visible'); }, 2400);
+  }
+
+  function updateBookmarkCount() {
+    const n = bookmarks.list().length;
+    const badge = document.getElementById('bookmark-count');
+    badge.textContent = String(n);
+    badge.setAttribute('aria-label', t('bookmarkCount', n));
+  }
+
+  function syncBookmarkButtons(id) {
+    const saved = bookmarks.has(id);
+    document.querySelectorAll('[data-bookmark="' + id + '"]').forEach(function (btn) {
+      btn.setAttribute('data-saved', String(saved));
+      if (btn.hasAttribute('aria-pressed')) btn.setAttribute('aria-pressed', String(saved));
+      const label = btn.querySelector('.btn-label');
+      if (label) label.textContent = t(saved ? 'unsave' : 'save');
+      if (btn.title) btn.title = t(saved ? 'unsave' : 'save');
+      if (saved) { btn.classList.remove('is-popping'); void btn.offsetWidth; btn.classList.add('is-popping'); }
+    });
+  }
+
+  function onBookmark(id) {
+    const result = bookmarks.toggle(id);
+    updateBookmarkCount();
+    syncBookmarkButtons(id);
+    toast(result.persisted ? t(result.saved ? 'toast.saved' : 'toast.removed') : t('toast.noStorage'));
+    if (currentRoute.name === 'bookmarks' && !result.saved) renderRoute(true);
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    return new Promise(function (resolve, reject) {
+      const ta = h('textarea', { 'aria-hidden': 'true', tabindex: '-1', style: 'position:fixed;opacity:0;top:0' });
+      ta.value = text;
+      document.body.append(ta);
+      ta.select();
+      try { document.execCommand('copy') ? resolve() : reject(new Error('copy failed')); }
+      catch (e) { reject(e); } finally { ta.remove(); }
+    });
+  }
+
+  /** Copies the quote in the language currently on screen. */
+  function onCopy(id) {
+    copyText(qv(byId.get(id)).text).then(
+      function () { toast(t('toast.copied')); },
+      function () { toast(t('toast.copyFail')); }
+    );
+  }
+
+  /** A shareable address for one quote, or '' when the page is opened from a file (no real URL to share). */
+  function permalink(id) {
+    return /^https?:$/.test(location.protocol) ? location.href.split('#')[0] + quoteHref(id) : '';
+  }
+
+  /** Uses the phone's share sheet (WhatsApp, Messages, …) when available, otherwise copies text + link. */
+  function onShare(id) {
+    const text = qv(byId.get(id)).text;
+    const url = permalink(id);
+    function fallback() {
+      copyText(text + (url ? '\n' + url : '')).then(
+        function () { toast(t(url ? 'toast.linkCopied' : 'toast.copied')); },
+        function () { toast(t('toast.copyFail')); }
+      );
+    }
+    if (navigator.share) {
+      const data = { title: 'Little Wisdom', text: text };
+      if (url) data.url = url;
+      navigator.share(data).catch(function (e) { if (!e || e.name !== 'AbortError') fallback(); });
+    } else {
+      fallback();
+    }
+  }
+
+  /* ---------- Browsing context (which list Next/Previous walks through) ---------- */
+  const FILTER_KEYS = ['cat', 'tag', 'q', 'author'];
+
+  /** Active filters -> query string such as "cat=life&q=focus" (empty when unfiltered). */
+  function filterQuery(f) {
+    const p = new URLSearchParams();
+    FILTER_KEYS.forEach(function (k) { if (f[k]) p.set(k, f[k]); });
+    return p.toString();
+  }
+
+  function quoteHref(id, ctx) { return '#/quote/' + id + (ctx ? '?' + ctx : ''); }
+
+  /**
+   * Resolves the list a quote page steps through, from the URL's query.
+   * Returns the list, a human label (null = whole collection) and where "back" goes.
+   * Labels are functions of the language so they re-render correctly when the language changes.
+   */
+  function resolveContext(params, quote) {
+    const whole = { list: QUOTES, label: null, query: '', back: '#/library', backKey: 'backCollection' };
+    let ctx = whole;
+    if (params.saved === '1') {
+      ctx = { list: bookmarks.list().map(function (id) { return byId.get(id); }), label: t('bm.inLabel'), query: 'saved=1', back: '#/bookmarks', backKey: 'backBookmarks' };
+    } else if (params.disc && window.DISCOVER) {
+      // Stepping through the quotes recommended for a feeling or topic.
+      const bits = params.disc.split(':');
+      const o = window.DISCOVER.find(bits[0], bits[1]);
+      if (o) ctx = {
+        list: window.DISCOVER.recommend(QUOTES, o), label: I18N.lang === 'ar' ? o.ar : o.en, query: 'disc=' + params.disc,
+        back: '#/discover?' + (bits[0] === 'feel' ? 'feel' : 'topic') + '=' + bits[1], backKey: 'backDiscover'
+      };
+    } else {
+      const f = {};
+      FILTER_KEYS.forEach(function (k) { if (params[k]) f[k] = params[k]; });
+      const query = filterQuery(f);
+      if (query) {
+        const bits = [];
+        if (f.cat) bits.push(catName(f.cat));
+        if (f.tag) bits.push('#' + tagName(f.tag));
+        if (f.q) bits.push(t('q', f.q));
+        if (f.author) bits.push(f.author);
+        ctx = { list: filterQuotes(f), label: bits.join(' · '), query: query, back: '#/library?' + query, backKey: 'backResults' };
+      }
+    }
+    // If the quote is not in that list (e.g. bookmark removed, stale link), fall back to the whole collection.
+    return ctx.list.indexOf(quote) === -1 ? whole : ctx;
+  }
+
+  /* ---------- Quote presentation ---------- */
+  function lengthClass(v) {
+    const n = v.text.length;
+    // A list or multi-paragraph quote reads as long text even when it is short in characters.
+    if (/\n/.test(v.text) && n > 80) return 'len-long';
+    const base = n <= 48 ? 'len-short' : n <= 125 ? 'len-medium' : 'len-long';
+    // Text typed entirely in capitals (Quote 52) is set smaller so it does not shout.
+    return v.lang === 'en' && /[A-Z]/.test(v.text) && v.text === v.text.toUpperCase() ? base + ' is-caps' : base;
+  }
+
+  /* ---------- Atmosphere: time of day and season, read from the visitor's own clock ---------- */
+  function atmosphere() {
+    const d = new Date(), hour = d.getHours(), month = d.getMonth();
+    const time = hour >= 5 && hour < 11 ? 'morning' : hour < 17 && hour >= 11 ? 'day' : hour >= 17 && hour < 21 ? 'evening' : 'night';
+    // Japan's four seasons by month (the Arabic-speaking north shares the same calendar).
+    const season = month >= 2 && month <= 4 ? 'spring' : month >= 5 && month <= 7 ? 'summer' : month >= 8 && month <= 10 ? 'autumn' : 'winter';
+    document.documentElement.setAttribute('data-time', time);
+    document.documentElement.setAttribute('data-season', season);
+    return { time: time, season: season };
+  }
+
+  const LAST_KEY = 'littlewisdom.last.v1';
+  function lastRead() {
+    try { const id = localStorage.getItem(LAST_KEY); return id && byId.has(id) ? byId.get(id) : null; } catch (e) { return null; }
+  }
+  function rememberLast(id) { try { localStorage.setItem(LAST_KEY, id); } catch (e) { /* optional nicety */ } }
+
+  /** Icon-only bookmark toggle used on cards (tooltip + accessible name + aria-pressed). */
+  function bookmarkIconButton(q) {
+    const saved = bookmarks.has(q.id);
+    const btn = h('button', {
+      type: 'button', class: 'icon-btn', 'data-bookmark': q.id, 'data-saved': String(saved),
+      'aria-pressed': String(saved), 'aria-label': t('bookmarkAria', qv(q).title), title: t(saved ? 'unsave' : 'save'),
+      onclick: function () { onBookmark(q.id); }
+    });
+    btn.innerHTML = ICONS.bookmark;
+    return btn;
+  }
+
+  /** Labelled bookmark button: the visible text itself says what will happen. */
+  function bookmarkTextButton(q, extraClass) {
+    const saved = bookmarks.has(q.id);
+    return h('button', {
+      type: 'button', class: 'btn ' + (extraClass || ''), 'data-bookmark': q.id, 'data-saved': String(saved),
+      onclick: function () { onBookmark(q.id); }
+    }, icon('bookmark'), h('span', { class: 'btn-label' }, t(saved ? 'unsave' : 'save')));
+  }
+
+  /** One card style everywhere: quiet paper, typography first. */
+  function quoteCard(q, ctx) {
+    const v = qv(q);
+    const link = h('a', { class: 'qcard__link', href: quoteHref(q.id, ctx) },
+      h('p', { class: 'qcard__no' }, t('quoteNo', q.number)),
+      h('p', Object.assign({ class: 'qcard__title' }, langAttrs(v)), v.title),
+      h('blockquote', Object.assign({ class: 'q-text', style: 'margin:0' }, langAttrs(v)), v.text),
+      h('div', { class: 'qcard__meta' }, q.categories.slice(0, 2).map(function (c) { return h('span', { class: 'chip' }, catName(c)); })),
+      h('p', { class: 'qcard__cta' }, t('readQuote'), icon('next')));
+    return h('article', { class: 'qcard ' + lengthClass(v) }, link, bookmarkIconButton(q));
+  }
+
+  /** A bookmarks entry: a line in a personal notebook. */
+  function noteEntry(q, ctx) {
+    const v = qv(q);
+    return h('li', {}, h('article', { class: 'qcard qcard--note ' + lengthClass(v) },
+      h('a', { class: 'qcard__link', href: quoteHref(q.id, ctx) },
+        h('p', { class: 'qcard__no' }, t('quoteNo', q.number)),
+        h('p', Object.assign({ class: 'qcard__title' }, langAttrs(v)), v.title),
+        h('blockquote', Object.assign({ class: 'q-text', style: 'margin:0' }, langAttrs(v)), v.text)),
+      bookmarkIconButton(q)));
+  }
+
+  function cardGrid(list, ctx) {
+    return h('div', { class: 'card-grid' }, list.map(function (q) { return quoteCard(q, ctx); }));
+  }
+
+  /* ---------- Search & filter ---------- */
+  /**
+   * Lower-cases, strips Latin accents, and folds Arabic spelling variants so that
+   * أ/إ/آ → ا, ى → ي, ة → ه, and diacritics/tatweel are ignored.
+   */
+  const normalize = function (s) {
+    return s.toLowerCase().normalize('NFD')
+      .replace(/[̀-ًͯ-ٰٟـ]/g, '')
+      .replace(/[أإآٱ]/g, 'ا')
+      .replace(/ى/g, 'ي')
+      .replace(/ة/g, 'ه');
+  };
+  const hasSources = QUOTES.some(function (q) { return q.author; });
+  const allTags = Array.from(new Set(QUOTES.flatMap(function (q) { return q.tags; }))).sort();
+  const allAuthors = Array.from(new Set(QUOTES.map(function (q) { return q.author; }).filter(Boolean))).sort();
+  // One search string per quote covering BOTH languages, built once: a visitor can type
+  // English or Arabic in either mode and still find the quote.
+  const haystack = new Map(QUOTES.map(function (q) {
+    const a = AR[q.id] || {};
+    const parts = [q.title, q.text, a.title, a.text, q.author, q.tags.join(' '), q.tags.map(function (g) { return TAGS_AR[g]; }).join(' ')];
+    q.categories.forEach(function (c) {
+      parts.push(c, CATEGORIES.find(function (k) { return k.id === c; }).name, (CATEGORIES_AR[c] || {}).name);
+    });
+    return [q.id, normalize(parts.filter(Boolean).join(' '))];
+  }));
+
+  function filterQuotes(f) {
+    const terms = normalize(f.q || '').split(/\s+/).filter(Boolean);
+    return QUOTES.filter(function (q) {
+      if (f.cat && q.categories.indexOf(f.cat) === -1) return false;
+      if (f.tag && q.tags.indexOf(f.tag) === -1) return false;
+      if (f.author && q.author !== f.author) return false;
+      return terms.every(function (term) { return haystack.get(q.id).indexOf(term) !== -1; });
+    });
+  }
+
+  /* ---------- Shared pieces ---------- */
+  function emptyState(title, message, actions, scene) {
+    return h('div', { class: 'empty' },
+      h('div', { class: 'empty__art' }, window.sceneElement(scene || 'rain', { decorative: true })),
+      h('h2', {}, title), h('p', {}, message), actions);
+  }
+
+  function goRandom() {
+    const q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+    location.hash = quoteHref(q.id);
+  }
+
+  /** One quote per calendar day (local time), chosen from the short, hero-worthy ones. */
+  function quoteOfTheDay() {
+    const pool = QUOTES.filter(function (q) { return q.text.length <= 160; });
+    const d = new Date();
+    const dayNumber = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
+    return pool[dayNumber % pool.length].id;
+  }
+
+  /* ---------- Views ---------- */
+  let featuredId = quoteOfTheDay();
+  let featuredIsDaily = true;
+
+  function homeView() {
+    const atm = atmosphere();
+    const featuredHost = h('section', { class: 'section featured-sec', 'aria-labelledby': 'featured-h' });
+    function paintFeatured() {
+      const q = byId.get(featuredId);
+      const v = qv(q);
+      featuredHost.replaceChildren(
+        h('div', { class: 'wrap featured ' + lengthClass(v) },
+          h('p', { class: 'label', id: 'featured-h' }, t(featuredIsDaily ? 'featured.daily' : 'featured.plain') + ' · ' + t('quoteNo', q.number)),
+          h('blockquote', { style: 'margin:0' }, h('p', Object.assign({ class: 'q-text' }, langAttrs(v)), v.text)),
+          h('p', Object.assign({ class: 'featured-title' }, langAttrs(v)), v.title),
+          h('div', { class: 'featured-actions' },
+            h('a', { class: 'btn', href: quoteHref(q.id) }, t('readQuote'), icon('next')),
+            bookmarkTextButton(q, 'btn--ghost'),
+            h('button', {
+              class: 'btn btn--ghost', type: 'button',
+              onclick: function () {
+                const others = QUOTES.filter(function (x) { return x.id !== featuredId && x.text.length < 160; });
+                featuredId = others[Math.floor(Math.random() * others.length)].id;
+                featuredIsDaily = false;
+                paintFeatured();
+              }
+            }, icon('shuffle'), t('showAnother'))
+          )
+        )
+      );
+    }
+    paintFeatured();
+
+    const selected = ['q07', 'q08', 'q14', 'q17', 'q21', 'q28'].map(function (id) { return byId.get(id); }).filter(Boolean);
+    const byLength = QUOTES.slice().sort(function (a, b) { return qv(a).text.length - qv(b).text.length; });
+    const shortest = byLength.slice(0, 5);
+    const longest = byLength.slice(-5).reverse();
+    const beginning = QUOTES.slice(0, 5);
+
+    const list = function (items) {
+      return h('ul', {}, items.map(function (q) {
+        const v = qv(q);
+        return h('li', {}, h('a', { href: quoteHref(q.id) },
+          h('span', Object.assign({ class: 'd-title' }, langAttrs(v)), pad(q.number) + ' · ' + v.title),
+          h('span', Object.assign({ class: 'd-excerpt' }, langAttrs(v)), v.text.replace(/\n+/g, ' '))));
+      }));
+    };
+
+    const last = lastRead();
+    const lv = last ? qv(last) : null;
+
+    return h('div', {},
+      h('section', { class: 'hero' },
+        h('div', { class: 'wrap hero-text' },
+          h('p', { class: 'greeting' }, t('greet.' + atm.time) + ' · ' + t('season.' + atm.season)),
+          h('h1', {}, t('hero.title1'), h('em', {}, t('hero.title2'))),
+          h('p', { class: 'hero-lede' }, t('hero.lede')),
+          h('div', { class: 'hero-actions' },
+            h('a', { class: 'btn', href: quoteHref(QUOTES[0].id) }, t('startWith', 1), icon('next')),
+            h('a', { class: 'btn btn--ghost', href: '#/library' }, t('browseAll', QUOTES.length))),
+          last ? h('p', { class: 'resume' }, h('a', { href: quoteHref(last.id) }, t('resume', last.number),
+            h('span', Object.assign({ class: 'resume__title' }, langAttrs(lv)), ' — ' + lv.title))) : null
+        ),
+        h('div', { class: 'wrap hero-scene' },
+          h('div', { class: 'scene-frame' }, window.sceneElement('home', { live: true }), h('span', { class: 'daylight', 'aria-hidden': 'true' })))
+      ),
+      featuredHost,
+      discoverTeaser(),
+      h('section', { class: 'section', 'aria-labelledby': 'cats-h' },
+        h('div', { class: 'wrap' },
+          h('div', { class: 'section-head' },
+            h('h2', { id: 'cats-h' }, t('cats.title')),
+            h('p', {}, t('cats.sub'))),
+          h('div', { class: 'shelf' }, CATEGORIES.map(function (c, i) {
+            const count = QUOTES.filter(function (q) { return q.categories.indexOf(c.id) !== -1; }).length;
+            return h('a', { class: 'book book--' + ((i % 7) + 1), href: '#/library?cat=' + c.id },
+              h('span', { class: 'num' }, t('categoryCount', i + 1, count)),
+              h('h3', {}, catName(c.id)), h('p', {}, catBlurb(c.id)));
+          }).concat([
+            h('button', { class: 'book book--random', type: 'button', onclick: goRandom },
+              icon('shuffle'), h('span', { class: 'book__label' }, t('keep.random')))
+          ])))
+      ),
+      h('section', { class: 'section', 'aria-labelledby': 'sel-h' },
+        h('div', { class: 'wrap' },
+          h('div', { class: 'section-head' },
+            h('h2', { id: 'sel-h' }, t('selected.title')),
+            h('a', { class: 'btn btn--ghost btn--small', href: '#/library' }, t('browseAll', QUOTES.length), icon('next'))),
+          cardGrid(selected))
+      ),
+      h('section', { class: 'section section--last', 'aria-labelledby': 'disc-h' },
+        h('div', { class: 'wrap' },
+          h('div', { class: 'section-head' },
+            h('h2', { id: 'disc-h' }, t('keep.title'))),
+          h('div', { class: 'discover' },
+            h('div', {}, h('h3', {}, t('keep.begin')), list(beginning)),
+            h('div', {}, h('h3', {}, t('keep.short')), list(shortest)),
+            h('div', {}, h('h3', {}, t('keep.long')), list(longest))))
+      )
+    );
+  }
+
+  const libraryState = { q: '', cat: '', tag: '', author: '' };
+
+  function libraryView(params) {
+    // Filters come from the URL, so refresh, Back and shared links all restore them.
+    libraryState.cat = CATEGORIES.some(function (c) { return c.id === params.cat; }) ? params.cat : '';
+    libraryState.tag = allTags.indexOf(params.tag) !== -1 ? params.tag : '';
+    libraryState.author = allAuthors.indexOf(params.author) !== -1 ? params.author : '';
+    libraryState.q = params.q || '';
+
+    const results = h('div', { id: 'results' });
+    const count = h('p', { class: 'result-count', 'aria-live': 'polite' });
+    const input = h('input', {
+      id: 'search', type: 'search', placeholder: t('lib.placeholder'), autocomplete: 'off',
+      oninput: function () { libraryState.q = input.value; paint(); }
+    });
+    input.value = libraryState.q;
+
+    const chips = h('div', { class: 'filter-row filter-row--themes', role: 'group', 'aria-label': t('lib.filterAria') });
+    const tagSelect = h('select', { id: 'tag', onchange: function () { libraryState.tag = tagSelect.value; paint(); } },
+      h('option', { value: '' }, t('lib.allTags')),
+      sortedTags().map(function (g) { return h('option', { value: g }, tagName(g)); }));
+    tagSelect.value = libraryState.tag;
+    const authorSelect = hasSources ? h('select', { id: 'author', onchange: function () { libraryState.author = authorSelect.value; paint(); } },
+      h('option', { value: '' }, t('lib.allSources')),
+      allAuthors.map(function (a) { return h('option', { value: a }, a); })) : null;
+    if (authorSelect) authorSelect.value = libraryState.author;
+
+    const clear = h('button', { type: 'button', class: 'btn btn--ghost btn--small', onclick: function () {
+      libraryState.q = libraryState.cat = libraryState.tag = libraryState.author = '';
+      input.value = ''; tagSelect.value = ''; if (authorSelect) authorSelect.value = '';
+      paint(); input.focus();
+    } }, t('lib.clear'));
+
+    function paintChips() {
+      chips.replaceChildren.apply(chips, [{ id: '', name: t('lib.allThemes') }].concat(CATEGORIES.map(function (c) {
+        return { id: c.id, name: catName(c.id) };
+      })).map(function (c) {
+        return h('button', {
+          type: 'button', class: 'pill', 'aria-pressed': String(libraryState.cat === c.id),
+          onclick: function () { libraryState.cat = c.id; paint(); }
+        }, c.name);
+      }));
+    }
+
+    function paint() {
+      paintChips();
+      const list = filterQuotes(libraryState);
+      const query = filterQuery(libraryState);
+      clear.hidden = !query;
+      // Keep the URL in sync without adding history entries or re-rendering.
+      try { history.replaceState(null, '', '#/library' + (query ? '?' + query : '')); } catch (e) { /* e.g. sandboxed frame */ }
+      count.textContent = !query ? t('lib.showingAll', QUOTES.length) : t('lib.found', list.length);
+      results.replaceChildren(list.length ? cardGrid(list, query) : emptyState(
+        t('lib.emptyTitle'), t('lib.emptyText'),
+        h('button', { class: 'btn', type: 'button', onclick: function () { clear.click(); } }, t('lib.clear'))));
+      // On phones the theme pills scroll sideways; keep the chosen one in view.
+      const on = chips.querySelector('[aria-pressed="true"]');
+      if (on && chips.scrollWidth > chips.clientWidth) {
+        const box = chips.getBoundingClientRect(), pill = on.getBoundingClientRect();
+        // scrollLeft deltas are physical, so this works in both left-to-right and right-to-left.
+        if (pill.left < box.left) chips.scrollLeft += pill.left - box.left - 16;
+        else if (pill.right > box.right) chips.scrollLeft += pill.right - box.right + 16;
+      }
+    }
+
+    const view = h('div', { class: 'wrap' },
+      h('div', { class: 'page-head' },
+        h('h1', {}, t('lib.title')),
+        h('p', {}, t('lib.intro'))),
+      h('div', { class: 'filters' },
+        h('div', { class: 'search-field' },
+          h('label', { class: 'visually-hidden', for: 'search' }, t('lib.searchLabel')), icon('search'), input),
+        chips,
+        h('div', { class: 'filter-row' },
+          h('label', { class: 'select-wrap', for: 'tag' }, t('lib.tag'), tagSelect),
+          authorSelect ? h('label', { class: 'select-wrap', for: 'author' }, t('lib.source'), authorSelect) : null,
+          clear, count)),
+      results);
+    paint();
+    if (params.focus === '1') setTimeout(function () { input.focus(); }, 0);
+    return view;
+  }
+
+  function related(q) {
+    return QUOTES.filter(function (x) { return x.id !== q.id; }).map(function (x) {
+      const score = x.categories.filter(function (c) { return q.categories.indexOf(c) !== -1; }).length * 2 +
+        x.tags.filter(function (g) { return q.tags.indexOf(g) !== -1; }).length * 3;
+      return { quote: x, score: score };
+    }).filter(function (r) { return r.score > 0; })
+      .sort(function (a, b) { return b.score - a.score || a.quote.number - b.quote.number; })
+      .slice(0, 3).map(function (r) { return r.quote; });
+  }
+
+  // Targets for the arrow-key shortcuts on the quote page.
+  let activeStep = { prev: null, next: null };
+
+  function stepControl(kind, target, ctx, variant) {
+    const isNext = kind === 'next';
+    const text = t(isNext ? 'next' : 'prev');
+    const tv = target ? qv(target) : null;
+    const content = variant === 'large'
+      ? [h('span', { class: 'step-dir' }, isNext ? null : icon('prev'), text, isNext ? icon('next') : null),
+         target ? h('span', Object.assign({ class: 'step-title' }, langAttrs(tv)), pad(target.number) + ' · ' + tv.title) : null]
+      : [isNext ? null : icon('prev'), text, isNext ? icon('next') : null];
+    const cls = (variant === 'large' ? 'step step--' : 'btn btn--small step-btn step-btn--') + kind;
+    if (!target) {
+      return h('span', { class: cls + ' is-disabled', 'aria-disabled': 'true' }, content);
+    }
+    return h('a', { class: cls, href: quoteHref(target.id, ctx.query), rel: kind === 'next' ? 'next' : 'prev' }, content);
+  }
+
+  function quoteView(id, params) {
+    const q = byId.get(id);
+    if (!q) return notFoundView();
+    const v = qv(q);
+    const ctx = resolveContext(params, q);
+    const i = ctx.list.indexOf(q);
+    const prev = ctx.list[i - 1] || null, next = ctx.list[i + 1] || null;
+    activeStep = { prev: prev && quoteHref(prev.id, ctx.query), next: next && quoteHref(next.id, ctx.query) };
+    const rel = related(q);
+    const filtered = ctx.label !== null;
+    const position = filtered ? t('positionIn', i + 1, ctx.list.length, ctx.label) : t('positionWhole', q.number, QUOTES.length);
+    // Built fresh per use: one DOM node cannot live in two places (the bar at the top and the one below).
+    const instead = function () { return filtered ? [' · ', h('a', { href: quoteHref(q.id) }, t('browseInstead', QUOTES.length))] : null; };
+
+    const endNote = !next
+      ? h('p', { class: 'end-note' }, filtered ? t('end.lastIn', ctx.label) : t('end.last'),
+          h('a', { href: filtered ? ctx.back : quoteHref(QUOTES[0].id) }, filtered ? t(ctx.backKey) : t('end.restart')))
+      : !prev
+        ? h('p', { class: 'end-note' }, filtered ? t('end.firstIn', ctx.label) : t('end.first'))
+        : null;
+
+    // In Arabic mode the original English stays visible beneath the translation (trust + context).
+    const original = v.lang === 'ar'
+      ? h('aside', { class: 'original' },
+          h('p', { class: 'label' }, t('original')),
+          h('p', { class: 'original__text', lang: 'en', dir: 'ltr' }, q.text))
+      : null;
+
+    return h('div', { class: 'wrap reader' },
+      h('nav', { class: 'quote-bar', 'aria-label': t('quoteNav') },
+        h('a', { class: 'back-link', href: ctx.back }, icon('prev'), t(ctx.backKey)),
+        h('div', { class: 'quote-bar__steps' }, stepControl('prev', prev, ctx, 'compact'), stepControl('next', next, ctx, 'compact'))),
+      h('p', { class: 'position position--top' }, position, instead()),
+      h('div', { class: 'reader-split' },
+      h('figure', { class: 'reader-art' }, q.imageUrl ? h('img', { src: q.imageUrl, alt: '', loading: 'lazy', class: 'reader-photo' }) : window.sceneElement(q.image, { decorative: false, live: true })),
+      h('div', { class: 'reader-grid' },
+        h('article', { class: lengthClass(v) },
+          h('p', { class: 'label' }, t('quoteNo', q.number) + ' · ' + q.categories.map(catName).join(' · ')),
+          h('h1', Object.assign({ class: 'reader-title', tabindex: '-1' }, langAttrs(v)), v.title),
+          h('blockquote', {}, h('p', Object.assign({ class: 'q-text' }, langAttrs(v)), v.text)),
+          original,
+          (q.author || safeUrl(q.sourceUrl)) ? h('p', { class: 'reader-source' }, t('source') + ' ',
+            safeUrl(q.sourceUrl) ? h('a', { href: safeUrl(q.sourceUrl), rel: 'noopener noreferrer' }, q.author || safeUrl(q.sourceUrl)) : q.author) : null,
+          h('div', { class: 'reader-tags' }, q.tags.map(function (g) {
+            return h('a', { class: 'chip', href: '#/library?tag=' + encodeURIComponent(g), 'aria-label': t('tagAria', tagName(g)) }, '#' + tagName(g));
+          })),
+          h('div', { class: 'reader-actions' },
+            bookmarkTextButton(q),
+            h('button', { class: 'btn btn--ghost', type: 'button', onclick: function () { onCopy(q.id); } }, icon('copy'), t('copy')),
+            h('button', { class: 'btn btn--ghost', type: 'button', onclick: function () { onShare(q.id); } }, icon('share'), t('share')))
+        )
+      )),
+      h('section', { class: 'continue', 'aria-labelledby': 'cont-h' },
+        h('h2', { id: 'cont-h' }, t('continue')),
+        h('p', { class: 'position' }, position, instead()),
+        h('div', { class: 'continue__steps' }, stepControl('prev', prev, ctx, 'large'), stepControl('next', next, ctx, 'large')),
+        endNote,
+        h('p', { class: 'hint' }, t('hint'))),
+      rel.length ? h('section', { class: 'related', 'aria-labelledby': 'rel-h' }, h('h2', { id: 'rel-h' }, t('related')), cardGrid(rel)) : null
+    );
+  }
+
+  function bookmarksView() {
+    const saved = bookmarks.list().map(function (id) { return byId.get(id); });
+    return h('div', { class: 'wrap bookmarks-page' },
+      h('div', { class: 'page-head' },
+        h('h1', {}, t('bm.title')),
+        h('p', {}, t('bm.intro'))),
+      saved.length ? h('div', { class: 'notebook' }, h('ol', { class: 'notebook__list' }, saved.map(function (q) { return noteEntry(q, 'saved=1'); }))) : emptyState(
+        t('bm.emptyTitle'), t('bm.emptyText'),
+        h('a', { class: 'btn', href: '#/library' }, t('browseAll', QUOTES.length)), 'desk')
+    );
+  }
+
+  function notFoundView() {
+    activeStep = { prev: null, next: null };
+    return h('div', { class: 'wrap' }, emptyState(t('nf.title'), t('nf.text'),
+      h('a', { class: 'btn', href: '#/library' }, t('browseAll', QUOTES.length)), 'night'));
+  }
+
+  /* ---------- Router ---------- */
+  let currentRoute = { name: 'home' };
+
+
+  /* ---------- Discover what you need ---------- */
+  const D = window.DISCOVER;
+  const EYES = '<circle cx="9" cy="10" r=".9" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r=".9" fill="currentColor" stroke="none"/>';
+  const FACES = {
+    flat: '<path d="M7.500 10h3M13.500 10h3"/><path d="M8.500 16h7"/>',
+    swirl: '<circle cx="9" cy="10" r="1.600"/><circle cx="15" cy="10" r="1.600"/><path d="M8 16q1.500-2 3 0t3 0"/>',
+    puzzled: EYES + '<path d="M7 8l3-1M14 7.500h3"/><path d="M9 16q3-2 6 0"/>',
+    sweat: EYES + '<path d="M8.500 16l1.500-1 1.500 1 1.500-1 1.500 1"/><path d="M19 5q1.800 2.200 0 3.600-1.800-1.400 0-3.600z"/>',
+    tear: EYES + '<path d="M9.500 16.500q2.500-2 5 0"/><path d="M8.600 12.300q-1 1.400 0 2 1-.6 0-2z"/>',
+    worried: EYES + '<path d="M7 8.500l3-1.500M17 8.500l-3-1.500"/><path d="M9.500 16.500q2.500-1.600 5 0"/>',
+    angry: EYES + '<path d="M7 7l3.200 1.600M17 7l-3.200 1.600"/><path d="M9 16.500h6"/>',
+    unsure: EYES + '<path d="M9.500 15.500l5 1.500"/>',
+    sideways: '<circle cx="8" cy="10" r=".9" fill="currentColor" stroke="none"/><circle cx="14" cy="10" r=".9" fill="currentColor" stroke="none"/><circle cx="12" cy="16" r="1.200"/>',
+    eyeroll: '<circle cx="9" cy="10" r="1.800"/><circle cx="15" cy="10" r="1.800"/><circle cx="9" cy="9.300" r=".6" fill="currentColor" stroke="none"/><circle cx="15" cy="9.300" r=".6" fill="currentColor" stroke="none"/><path d="M9 16.500h4.500"/>',
+    yawn: '<path d="M7.500 10q1.500 1.500 3 0M13.500 10q1.500 1.500 3 0"/><ellipse cx="12" cy="16.500" rx="1.800" ry="2.200"/>',
+    smile: EYES + '<path d="M8 14.500q4 4.500 8 0"/>',
+    smirk: EYES + '<path d="M13.500 7.500H17"/><path d="M8.500 15q3.500 3 7-1"/>',
+    curious: EYES + '<path d="M13.500 6.500H17"/><circle cx="12" cy="16" r="1.200"/>',
+    glow: '<path d="M7.500 10.500q1.500-2 3 0M13.500 10.500q1.500-2 3 0"/><path d="M9 14.500q3 3.500 6 0"/><circle cx="6.800" cy="13.500" r=".9"/><circle cx="17.200" cy="13.500" r=".9"/>'
+  };
+  function faceIcon(kind) {
+    const s = document.createElement('span');
+    s.style.display = 'contents';
+    s.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.600" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.500"/>' + (FACES[kind] || FACES.smile) + '</svg>';
+    return s;
+  }
+  const optName = function (o) { return I18N.lang === 'ar' ? o.ar : o.en; };
+  const reduceMotion = function () { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; };
+
+  /** Small teaser on the home page: a few real starting points, then the full page. */
+  function discoverTeaser() {
+    const pick = function (list, ids) { return ids.map(function (id) { return list.filter(function (o) { return o.id === id; })[0]; }); };
+    const link = function (kind, o) { return h('a', { class: 'choice choice--link', href: '#/discover?' + (kind === 'feel' ? 'feel' : 'topic') + '=' + o.id }, kind === 'feel' ? faceIcon(o.face) : null, h('span', {}, optName(o))); };
+    return h('section', { class: 'section', 'aria-labelledby': 'dt-h' },
+      h('div', { class: 'wrap' },
+        h('div', { class: 'section-head' }, h('h2', { id: 'dt-h' }, t('disc.homeTitle')), h('p', {}, t('disc.homeSub'))),
+        h('div', { class: 'teaser-grid' },
+          h('div', { class: 'teaser' }, h('h3', {}, t('disc.feelQ')),
+            h('div', { class: 'choice-grid' }, pick(D.FEELINGS, ['unmotivated', 'overwhelmed', 'confused', 'distracted', 'impatient', 'happy']).map(function (o) { return link('feel', o); }))),
+          h('div', { class: 'teaser' }, h('h3', {}, t('disc.topicQ')),
+            h('div', { class: 'choice-grid choice-grid--topics' }, pick(D.TOPICS, ['discipline', 'learning', 'patience', 'productivity', 'success', 'perspective']).map(function (o) { return link('topic', o); })))
+        ),
+        h('p', { class: 'teaser-more' }, h('a', { class: 'btn btn--ghost btn--small', href: '#/discover' }, t('disc.seeAll'), icon('next')))
+      ));
+  }
+
+  function discoverView(params) {
+    let sel = null;
+    if (params.feel && D.find('feel', params.feel)) sel = { kind: 'feel', id: params.feel };
+    else if (params.topic && D.find('topic', params.topic)) sel = { kind: 'topic', id: params.topic };
+    const recHost = h('section', { class: 'rec', 'aria-live': 'polite' });
+    const buttons = [];
+    const top = h('div', { class: 'page-head', id: 'disc-top' }, h('h1', {}, t('disc.title')), h('p', {}, t('disc.lede')));
+
+    function choice(kind, o) {
+      const b = h('button', { class: 'choice', type: 'button', 'aria-pressed': 'false', 'data-kind': kind, 'data-id': o.id, onclick: function () { choose(kind, o.id, true); } },
+        kind === 'feel' ? faceIcon(o.face) : null, h('span', {}, optName(o)));
+      buttons.push(b);
+      return b;
+    }
+
+    function recView() {
+      const o = D.find(sel.kind, sel.id), label = optName(o);
+      const list = D.recommend(QUOTES, o), ctx = 'disc=' + sel.kind + ':' + sel.id;
+      const rel = D.related(QUOTES, sel.kind, o, 5);
+      const PAGE = 12;                                   // first screenful; the rest is one tap away, never hidden for good
+      const grid = list.length ? cardGrid(list.slice(0, PAGE), ctx) : null;
+      if (grid) Array.prototype.forEach.call(grid.children, function (c, i) { c.style.setProperty('--i', i); });
+      let shown = Math.min(PAGE, list.length), moreBtn = null, moreNote = null;
+      if (list.length > PAGE) {
+        moreNote = h('p', { class: 'rec__shown' }, t('disc.shown', shown, list.length));
+        moreBtn = h('button', { class: 'btn', type: 'button', onclick: function () {
+          const next = cardGrid(list.slice(shown, shown + PAGE), ctx), first = next.firstElementChild;
+          Array.prototype.slice.call(next.children).forEach(function (c) { grid.appendChild(c); });
+          shown = Math.min(shown + PAGE, list.length);
+          if (shown >= list.length) { moreBtn.remove(); } else { moreBtn.lastChild.textContent = t('disc.more', Math.min(PAGE, list.length - shown)); }
+          moreNote.textContent = t('disc.shown', shown, list.length);
+          const a = first && first.querySelector('a'); if (a) a.focus({ preventScroll: true });
+        } }, h('span', {}, t('disc.more', Math.min(PAGE, list.length - shown))));
+      }
+      // Empty state: say so plainly and point to options that do have entries.
+      const suggest = list.length ? rel : D.FEELINGS.map(function (o) { return { kind: 'feel', option: o }; }).concat(D.TOPICS.map(function (o) { return { kind: 'topic', option: o }; }))
+        .map(function (r) { r.n = D.recommend(QUOTES, r.option).length; return r; }).filter(function (r) { return r.n > 0; })
+        .sort(function (a, b) { return b.n - a.n; }).slice(0, 6);
+      return [
+        h('p', { class: 'label' }, t(sel.kind === 'feel' ? 'disc.feelFor' : 'disc.topicFor', label)),
+        h('h2', { class: 'rec__title' }, label),
+        h('p', { class: 'rec__count' }, list.length ? t('disc.count', list.length) : t('disc.none')),
+        list.length && list.length < 3 ? h('p', { class: 'rec__few' }, t('disc.few', list.length)) : null,
+        grid,
+        moreNote ? h('div', { class: 'rec__more' }, moreNote, moreBtn) : null,
+        suggest.length ? h('div', { class: 'rec__related' }, h('h3', {}, t(list.length ? 'disc.related' : 'disc.tryInstead')),
+          h('div', { class: 'choice-grid choice-grid--topics' }, suggest.map(function (r) {
+            return h('button', { class: 'choice choice--small', type: 'button', onclick: function () { choose(r.kind, r.option.id, true); } },
+              r.kind === 'feel' ? faceIcon(r.option.face) : null, h('span', {}, optName(r.option)));
+          }))) : null,
+        h('div', { class: 'rec__actions' },
+          h('button', { class: 'btn btn--ghost', type: 'button', onclick: function () { top.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' }); } }, icon('prev'), t('disc.another'))),
+        sel.kind === 'feel' ? h('p', { class: 'disc-note' }, t('disc.note')) : null
+      ];
+    }
+
+    function choose(kind, id, scroll) {
+      sel = { kind: kind, id: id };            // one choice at a time: a new one replaces the old
+      paint(scroll);
+    }
+    function paint(scroll) {
+      buttons.forEach(function (b) {
+        const on = !!sel && b.getAttribute('data-kind') === sel.kind && b.getAttribute('data-id') === sel.id;
+        b.setAttribute('aria-pressed', String(on));
+      });
+      recHost.replaceChildren.apply(recHost, sel ? recView().filter(Boolean) : []);
+      recHost.classList.remove('rec-in'); void recHost.offsetWidth; if (sel) recHost.classList.add('rec-in');
+      // Keep the address in step with the choice (shareable, and survives a language switch) without a page reload.
+      try { history.replaceState(null, '', '#/discover' + (sel ? '?' + (sel.kind === 'feel' ? 'feel' : 'topic') + '=' + sel.id : '')); } catch (e) { /* file:// quirks */ }
+      if (scroll && sel) recHost.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' });
+    }
+
+    const view = h('div', { class: 'wrap discover-page' },
+      top,
+      h('section', { class: 'ask', 'aria-labelledby': 'feel-h' },
+        h('h2', { id: 'feel-h' }, t('disc.feelQ')),
+        h('div', { class: 'choice-grid', role: 'group', 'aria-labelledby': 'feel-h' }, D.FEELINGS.map(function (o) { return choice('feel', o); }))),
+      h('section', { class: 'ask', 'aria-labelledby': 'topic-h' },
+        h('h2', { id: 'topic-h' }, t('disc.topicQ')),
+        h('div', { class: 'choice-grid choice-grid--topics', role: 'group', 'aria-labelledby': 'topic-h' }, D.TOPICS.map(function (o) { return choice('topic', o); }))),
+      recHost);
+    paint(false);
+    // Arriving from a link with a choice already made: bring the recommendations into view.
+    if (sel && !currentRoute.keep) setTimeout(function () { recHost.scrollIntoView({ behavior: 'auto', block: 'start' }); }, 0);
+    return view;
+  }
+
+  function parseHash() {
+    const raw = location.hash.replace(/^#\/?/, '');
+    const parts = raw.split('?');
+    const segs = parts[0].split('/').filter(Boolean);
+    const params = {};
+    new URLSearchParams(parts[1] || '').forEach(function (v, k) { params[k] = v; });
+    if (!segs.length) return { name: 'home', params: params };
+    if (segs[0] === 'library') return { name: 'library', params: params };
+    if (segs[0] === 'bookmarks') return { name: 'bookmarks', params: params };
+    if (segs[0] === 'discover') return { name: 'discover', params: params };
+    if (segs[0] === 'quote' && segs[1]) {
+      let id = segs[1];
+      try { id = decodeURIComponent(id); } catch (e) { /* keep raw */ }
+      return { name: 'quote', id: id, params: params };
+    }
+    return { name: 'notfound', params: params };
+  }
+
+  function renderRoute(keepScroll) {
+    currentRoute = parseHash();
+    currentRoute.keep = !!keepScroll;
+    activeStep = { prev: null, next: null };
+    let view, title = t('title.home');
+    switch (currentRoute.name) {
+      case 'home': view = homeView(); break;
+      case 'library': view = libraryView(currentRoute.params); title = t('title.lib'); break;
+      case 'bookmarks': view = bookmarksView(); title = t('title.bm'); break;
+      case 'discover': view = discoverView(currentRoute.params); title = t('title.disc'); break;
+      case 'quote': {
+        view = quoteView(currentRoute.id, currentRoute.params);
+        const q = byId.get(currentRoute.id);
+        title = q ? qv(q).title + ' · Little Wisdom' : t('title.nf');
+        break;
+      }
+      default: view = notFoundView(); title = t('title.nf');
+    }
+    atmosphere();
+    if (currentRoute.name === 'quote' && byId.has(currentRoute.id)) rememberLast(currentRoute.id);
+    app.replaceChildren(view);
+    if (!keepScroll) { app.classList.remove('view-in'); void app.offsetWidth; app.classList.add('view-in'); }
+    document.title = title;
+    document.querySelectorAll('[data-nav]').forEach(function (a) {
+      if (a.getAttribute('data-nav') === currentRoute.name) a.setAttribute('aria-current', 'page');
+      else a.removeAttribute('aria-current');
+    });
+    if (!keepScroll) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });   // never animate the jump: the next quote should simply be there
+      // Move focus to the new page's heading so keyboard and screen-reader users start at the top.
+      const heading = currentRoute.name === 'quote' ? app.querySelector('h1[tabindex="-1"]') : null;
+      (heading || main).focus({ preventScroll: true });
+    }
+  }
+
+  /* ---------- Language switch ---------- */
+  function syncLangButtons() {
+    document.querySelectorAll('.lang-btn').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.getAttribute('data-lang') === I18N.lang));
+    });
+  }
+
+  function applyLanguageToChrome() {
+    I18N.applyStatic(document);
+    syncLangButtons();
+    updateBookmarkCount();
+  }
+
+  function setLanguage(lang) {
+    if (lang === I18N.lang) return;
+    I18N.setLang(lang);
+    applyLanguageToChrome();
+    renderRoute(true);        // re-render in place: same page, same scroll position, same filters
+    toast(t('toast.lang'));
+  }
+
+  document.querySelectorAll('.lang-btn').forEach(function (b) {
+    b.addEventListener('click', function () { setLanguage(b.getAttribute('data-lang')); });
+  });
+
+  window.addEventListener('hashchange', function () { renderRoute(false); });
+
+  // Arrow keys step through quotes, following the on-screen direction (in Arabic, → is "previous").
+  // Ignored while typing or with a modifier key held.
+  document.addEventListener('keydown', function (e) {
+    if (currentRoute.name !== 'quote' || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    const el = e.target;
+    if (el && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))) return;
+    const forwardKey = isAr() ? 'ArrowLeft' : 'ArrowRight';
+    const href = e.key === forwardKey ? activeStep.next : activeStep.prev;
+    if (href) { e.preventDefault(); location.hash = href; }
+  });
+
+  // Keep bookmarks in sync if another tab changes them.
+  window.addEventListener('storage', function (e) {
+    if (e.key !== STORE_KEY) return;
+    bookmarks.reload();
+    updateBookmarkCount();
+    if (currentRoute.name === 'bookmarks') renderRoute(true);
+  });
+
+  applyLanguageToChrome();
+  renderRoute(true);
+});
+</script>
+</body>
+</html>
